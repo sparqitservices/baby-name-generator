@@ -15,7 +15,7 @@ Return ONLY a JSON array with this exact format:
 
 No explanations, just the JSON array.`;
 
-    // Use Groq API (Free & Fast)
+    // Use Groq API with WORKING model
     const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
     
     console.log('API Key present:', !!process.env.GROQ_API_KEY);
@@ -28,7 +28,7 @@ No explanations, just the JSON array.`;
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'llama-3.1-70b-versatile',
+        model: 'llama-3.3-70b-versatile', // ✅ Updated to working model
         messages: [
           {
             role: 'user',
