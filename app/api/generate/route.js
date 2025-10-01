@@ -15,21 +15,26 @@ Return ONLY a JSON array with this exact format:
 
 No explanations, just the JSON array.`;
 
-    // Try RouteLLM API endpoint
-    const apiUrl = 'https://api.abacus.ai/api/v0/getLLMResponse';
+    // Use Groq API (Free & Fast)
+    const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
     
-    console.log('API Key present:', !!process.env.ABACUS_API_KEY);
-    console.log('Calling:', apiUrl);
+    console.log('API Key present:', !!process.env.GROQ_API_KEY);
+    console.log('Calling Groq API...');
 
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.ABACUS_API_KEY}`
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        prompt: prompt,
-        model: 'gpt-4',
+        model: 'llama-3.1-70b-versatile',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
         temperature: 0.7,
         max_tokens: 500
       })
@@ -44,15 +49,14 @@ No explanations, just the JSON array.`;
       return NextResponse.json({ 
         names: getFallbackNames(gender, religion),
         fallback: true,
-        error: `API returned ${response.status}: ${errorText.substring(0, 100)}`
+        error: `API returned ${response.status}`
       });
     }
 
     const data = await response.json();
-    console.log('API Response:', JSON.stringify(data).substring(0, 300));
+    console.log('API Response received');
 
-    // Extract the content from various possible response formats
-    const content = data.completion || data.content || data.response || data.text || data.message || '';
+    const content = data.choices?.[0]?.message?.content || '';
 
     let names;
     try {
@@ -61,6 +65,7 @@ No explanations, just the JSON array.`;
       if (!Array.isArray(names)) {
         names = names.names || [];
       }
+      console.log('Successfully parsed names:', names.length);
     } catch (e) {
       console.error('Parse error:', e);
       names = getFallbackNames(gender, religion);
@@ -101,11 +106,11 @@ function getFallbackNames(gender, religion) {
         { name: 'Amina', meaning: 'Trustworthy, faithful', gender: 'girl', origin: 'Arabic', pronunciation: 'ah-MEE-nah' }
       ],
       any: [
-        { name: 'Amir', meaning: 'Prince, commander', gender: 'any', origin: 'Arabic', pronunciation: 'ah-MEER' },
-        { name: 'Zain', meaning: 'Beauty, grace', gender: 'any', origin: 'Arabic', pronunciation: 'ZAYN' },
         { name: 'Noor', meaning: 'Light', gender: 'any', origin: 'Arabic', pronunciation: 'NOOR' },
         { name: 'Rayan', meaning: 'Gates of heaven', gender: 'any', origin: 'Arabic', pronunciation: 'ray-YAN' },
-        { name: 'Sami', meaning: 'Elevated', gender: 'any', origin: 'Arabic', pronunciation: 'SAH-mee' }
+        { name: 'Sami', meaning: 'Elevated', gender: 'any', origin: 'Arabic', pronunciation: 'SAH-mee' },
+        { name: 'Iman', meaning: 'Faith', gender: 'any', origin: 'Arabic', pronunciation: 'ee-MAHN' },
+        { name: 'Karim', meaning: 'Generous', gender: 'any', origin: 'Arabic', pronunciation: 'kah-REEM' }
       ]
     },
     hindu: {
@@ -125,10 +130,10 @@ function getFallbackNames(gender, religion) {
       ],
       any: [
         { name: 'Aarya', meaning: 'Noble', gender: 'any', origin: 'Sanskrit', pronunciation: 'AAR-yah' },
-        { name: 'Avani', meaning: 'Earth', gender: 'any', origin: 'Sanskrit', pronunciation: 'ah-VAH-nee' },
         { name: 'Kiran', meaning: 'Ray of light', gender: 'any', origin: 'Sanskrit', pronunciation: 'kee-RAN' },
         { name: 'Prem', meaning: 'Love', gender: 'any', origin: 'Sanskrit', pronunciation: 'PREM' },
-        { name: 'Shanti', meaning: 'Peace', gender: 'any', origin: 'Sanskrit', pronunciation: 'SHAN-tee' }
+        { name: 'Shanti', meaning: 'Peace', gender: 'any', origin: 'Sanskrit', pronunciation: 'SHAN-tee' },
+        { name: 'Jaya', meaning: 'Victory', gender: 'any', origin: 'Sanskrit', pronunciation: 'JAY-ah' }
       ]
     }
   };
