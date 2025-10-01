@@ -1,6 +1,6 @@
 'use client';
 import { Moon, Sun, Heart } from 'lucide-react';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '../app/contexts/ThemeContext';
 import Link from 'next/link';
 import Logo from './Logo';
 

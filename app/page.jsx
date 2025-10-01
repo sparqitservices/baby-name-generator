@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
-import NameForm from './components/NameForm';
-import NameCard from './components/NameCard';
-import Logo from './components/Logo';
+import NameForm from '../components/NameForm';
+import NameCard from '../components/NameCard';
+import Logo from '../components/Logo';
 
 export default function Home() {
   const [names, setNames] = useState([]);
