@@ -1,7 +1,7 @@
 // app/favorites/page.jsx
 'use client';
 
-import { useFavorites } from '@/contexts/FavoritesContext';
+import { useFavorites } from '@/app/contexts/FavoritesContext';
 import NameCard from '@/components/NameCard';
 import { Download, FileJson, Printer, Trash2 } from 'lucide-react';
 import { exportToCSV, exportToJSON, printFavorites } from '@/utils/exportFavorites';
