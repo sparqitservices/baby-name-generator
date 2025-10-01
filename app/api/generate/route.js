@@ -9,7 +9,7 @@ export async function POST(request) {
     console.log('=== API Request Started ===');
     console.log('Params:', params);
 
-    const prompt = `Generate 5 ${gender} baby names for ${religion} religion in ${style} style. 
+    const prompt = `Generate 10 ${gender} baby names for ${religion} religion in ${style} style. 
 Return ONLY a JSON array with this exact format:
 [{"name": "Name", "meaning": "Meaning", "gender": "${gender}", "origin": "Origin"}]
 
