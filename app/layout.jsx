@@ -1,7 +1,7 @@
 import './globals.css';
 import Navbar from '../components/Navbar';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { FavoritesProvider } from './contexts/FavoritesContext';
+import { ThemeProvider } from '../contexts/ThemeContext';
+import { FavoritesProvider } from '../contexts/FavoritesContext';
 
 export const metadata = {
   title: 'BNG - AI Baby Name Generator',
