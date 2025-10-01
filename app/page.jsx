@@ -38,9 +38,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Hero Section */}
         <div className="text-center mb-16 space-y-6">
-          <div className="flex justify-center mb-6 animate-fade-in">
-            <Logo size="large" />
-          </div>
+          
           
           <h1 className="text-6xl md:text-7xl font-black text-gray-900 dark:text-white mb-6 animate-fade-in-up">
             <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
