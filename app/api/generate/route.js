@@ -10,12 +10,15 @@ export async function POST(request) {
     console.log('Params:', params);
 
     const prompt = `Generate 5 ${gender} baby names for ${religion} religion in ${style} style. 
-Return ONLY a JSON array with this format:
-[{"name": "Name", "meaning": "Meaning", "gender": "${gender}", "origin": "Origin"}]`;
+Return ONLY a JSON array with this exact format:
+[{"name": "Name", "meaning": "Meaning", "gender": "${gender}", "origin": "Origin"}]
 
-    // CORRECT Abacus.AI endpoint for ChatLLM
-    const apiUrl = 'https://api.abacus.ai/api/v0/sendChatMessage';
+No explanations, just the JSON array.`;
+
+    // ChatLLM Teams API endpoint
+    const apiUrl = 'https://api.abacus.ai/api/v0/createChatLLMResponse';
     
+    console.log('API Key present:', !!process.env.ABACUS_API_KEY);
     console.log('Calling:', apiUrl);
 
     const response = await fetch(apiUrl, {
@@ -25,19 +28,22 @@ Return ONLY a JSON array with this format:
         'Authorization': `Bearer ${process.env.ABACUS_API_KEY}`
       },
       body: JSON.stringify({
-        message: prompt,
-        conversationId: null, // New conversation
-        deploymentId: null // Use default model
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        maxTokens: 500
       })
     });
 
     console.log('Response status:', response.status);
 
-    const responseText = await response.text();
-    console.log('Response body:', responseText.substring(0, 500));
-
     if (!response.ok) {
-      console.error('API Error:', response.status, responseText);
+      const errorText = await response.text();
+      console.error('API Error:', response.status, errorText);
       
       return NextResponse.json({ 
         names: getFallbackNames(gender, religion),
@@ -46,10 +52,11 @@ Return ONLY a JSON array with this format:
       });
     }
 
-    const data = JSON.parse(responseText);
-    const content = data.response || data.message || data.text || '';
+    const data = await response.json();
+    console.log('API Response:', JSON.stringify(data).substring(0, 300));
 
-    console.log('Extracted content:', content.substring(0, 200));
+    // Extract the content from the response
+    const content = data.content || data.response || data.message || '';
 
     let names;
     try {
@@ -67,7 +74,7 @@ Return ONLY a JSON array with this format:
 
   } catch (error) {
     console.error('=== Full Error ===');
-    console.error('Error message:', error.message);
+    console.error('Error:', error.message);
     
     return NextResponse.json(
       { 
