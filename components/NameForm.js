@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 
 export default function NameForm({ onGenerate, isLoading }) {
   const [formData, setFormData] = useState({
@@ -9,18 +9,35 @@ export default function NameForm({ onGenerate, isLoading }) {
     style: 'modern',
     count: 20
   });
-  const [apiStatus, setApiStatus] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await onGenerate(formData);
-    
-    // Show API status message
-    if (result && !result.isApiWorking) {
-      setApiStatus(result.message || 'Using sample names');
-      setTimeout(() => setApiStatus(null), 5000);
-    } else {
-      setApiStatus(null);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `Server error: ${response.status}`);
+      }
+
+      if (!data.names || data.names.length === 0) {
+        throw new Error('No names generated. Please try again.');
+      }
+
+      // Pass names to parent component
+      onGenerate(data.names);
+      
+    } catch (err) {
+      console.error('❌ Generation error:', err);
+      setError(err.message || 'Failed to generate names. Please try again.');
     }
   };
 
@@ -44,11 +61,12 @@ export default function NameForm({ onGenerate, isLoading }) {
               key={option}
               type="button"
               onClick={() => setFormData({ ...formData, gender: option })}
-              className={`px-4 py-3 rounded-xl font-medium transition-all ${
+              disabled={isLoading}
+              className={`px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                 formData.gender === option
                   ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg scale-105'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-gray-200 dark:border-gray-700'
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {option.charAt(0).toUpperCase() + option.slice(1)}
             </button>
@@ -65,7 +83,8 @@ export default function NameForm({ onGenerate, isLoading }) {
           name="religion"
           value={formData.religion}
           onChange={handleChange}
-          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 transition-all"
+          disabled={isLoading}
+          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value="muslim">Muslim / Islamic</option>
           <option value="hindu">Hindu / Vedic</option>
@@ -86,7 +105,8 @@ export default function NameForm({ onGenerate, isLoading }) {
           name="style"
           value={formData.style}
           onChange={handleChange}
-          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 transition-all"
+          disabled={isLoading}
+          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value="modern">Modern & Trendy</option>
           <option value="traditional">Traditional & Classic</option>
@@ -100,7 +120,7 @@ export default function NameForm({ onGenerate, isLoading }) {
       {/* Number of Names */}
       <div className="space-y-3">
         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-          Number of Names: {formData.count}
+          Number of Names: <span className="text-indigo-600 dark:text-indigo-400">{formData.count}</span>
         </label>
         <input
           type="range"
@@ -110,37 +130,63 @@ export default function NameForm({ onGenerate, isLoading }) {
           step="5"
           value={formData.count}
           onChange={handleChange}
-          className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+          disabled={isLoading}
+          className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
         />
+        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+          <span>5</span>
+          <span>25</span>
+          <span>50</span>
+        </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl animate-shake">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-red-800 dark:text-red-200 mb-1">
+                Generation Failed
+              </h4>
+              <p className="text-sm text-red-700 dark:text-red-300">
+                {error}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setError(null)}
+              className="text-red-400 hover:text-red-600 dark:hover:text-red-200 transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Generate Button */}
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
       >
         {isLoading ? (
           <>
             <Loader2 className="w-5 h-5 animate-spin" />
-            Generating...
+            <span>Generating Amazing Names...</span>
           </>
         ) : (
           <>
             <Sparkles className="w-5 h-5" />
-            Generate Names
+            <span>Generate Names</span>
           </>
         )}
       </button>
 
-      {/* API Status Message */}
-      {apiStatus && (
-        <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-          <p className="text-sm text-yellow-800 dark:text-yellow-200 text-center">
-            ⚠️ {apiStatus}
-          </p>
-        </div>
-      )}
+      {/* Info Text */}
+      <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+        Powered by AI • {formData.count} unique names will be generated
+      </p>
     </form>
   );
 }
