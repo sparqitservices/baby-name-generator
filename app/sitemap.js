@@ -1,5 +1,5 @@
 export default function sitemap() {
-  const baseUrl = 'https://baby-name-generator-afzal.vercel.app';
+  const baseUrl = 'https://babynamegenerator.xyz';
   
   return [
     {
@@ -13,12 +13,6 @@ export default function sitemap() {
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/generate`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
     },
   ];
 }

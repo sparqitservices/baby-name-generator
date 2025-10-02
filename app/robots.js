@@ -5,6 +5,6 @@ export default function robots() {
       allow: '/',
       disallow: ['/api/', '/admin/'],
     },
-    sitemap: 'https://baby-name-generator-afzal.vercel.app/sitemap.xml',
+    sitemap: 'https://babynamegenerator.xyz/sitemap.xml',
   };
 }

@@ -19,7 +19,7 @@
 
 ## 🚀 Live Demo
 
-[https://baby-name-generator-afzal.vercel.app](https://baby-name-generator-afzal.vercel.app)
+**[https://babynamegenerator.xyz](https://babynamegenerator.xyz)**
 
 ## 🛠️ Tech Stack
 

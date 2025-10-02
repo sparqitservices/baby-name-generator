@@ -16,18 +16,25 @@ export async function POST(request) {
         });
       }
 
-      const prompt = `Generate ${count} beautiful ${gender === 'any' ? '' : gender} baby names for ${religion} religion with ${style} style. 
+      console.log('🔑 API Key found:', apiKey.substring(0, 10) + '...');
+
+      const prompt = `Generate exactly ${count} beautiful baby names with the following criteria:
+- Gender: ${gender === 'any' ? 'unisex or any gender' : gender}
+- Religion: ${religion}
+- Style: ${style}
 
 For each name, provide:
-- name: the actual name
-- meaning: detailed meaning
-- origin: cultural origin
-- gender: boy/girl/any
+1. name: the actual name
+2. meaning: detailed meaning and significance
+3. origin: cultural/linguistic origin
+4. gender: boy/girl/any
 
-Return ONLY a valid JSON array of objects. Example format:
-[{"name":"Amir","meaning":"Prince, commander","origin":"Arabic","gender":"boy"}]`;
+Return ONLY a valid JSON array. Example:
+[{"name":"Amir","meaning":"Prince, commander","origin":"Arabic","gender":"boy"}]
 
-      console.log('🚀 Calling API...');
+Generate ${count} names now:`;
+
+      console.log('🚀 Calling Abacus API...');
 
       const response = await fetch('https://api.abacus.ai/api/v0/generateText', {
         method: 'POST',
@@ -38,19 +45,22 @@ Return ONLY a valid JSON array of objects. Example format:
         body: JSON.stringify({
           prompt: prompt,
           model: 'gpt-4o',
-          temperature: 0.8,
-          max_tokens: 3000
+          temperature: 0.9,
+          max_tokens: 4000
         }),
-        signal: AbortSignal.timeout(30000) // 30 second timeout
+        signal: AbortSignal.timeout(45000) // 45 second timeout
       });
 
+      console.log('📡 API Response status:', response.status);
+
       if (!response.ok) {
-        console.error('❌ API Error:', response.status, response.statusText);
-        throw new Error(`API returned ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ API Error:', response.status, errorText);
+        throw new Error(`API returned ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('✅ API Response received');
+      console.log('✅ API Response received:', JSON.stringify(data).substring(0, 200));
 
       // Parse the generated text
       let names = [];
@@ -61,11 +71,18 @@ Return ONLY a valid JSON array of objects. Example format:
           if (jsonMatch) {
             names = JSON.parse(jsonMatch[0]);
             console.log(`✅ Parsed ${names.length} names from API`);
+          } else {
+            console.error('❌ No JSON array found in response');
+            console.log('Response text:', data.text.substring(0, 500));
           }
         } catch (parseError) {
           console.error('❌ Parse error:', parseError);
+          console.log('Failed to parse:', data.text.substring(0, 500));
           throw parseError;
         }
+      } else {
+        console.error('❌ No text field in API response');
+        console.log('Full response:', JSON.stringify(data));
       }
 
       // If API worked but parsing failed, use fallback
@@ -78,6 +95,7 @@ Return ONLY a valid JSON array of objects. Example format:
       }
 
       // API is working!
+      console.log('🎉 API working! Returning', names.length, 'names');
       return Response.json({ 
         names: names.slice(0, count),
         isApiWorking: true 
@@ -85,6 +103,7 @@ Return ONLY a valid JSON array of objects. Example format:
 
     } catch (apiError) {
       console.error('❌ API call failed:', apiError.message);
+      console.error('Full error:', apiError);
       // Return fallback data (max 5 names)
       return Response.json({ 
         names: getFallbackNames(gender, religion, Math.min(count, 5)),

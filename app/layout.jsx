@@ -7,6 +7,7 @@ import { FavoritesProvider } from '../contexts/FavoritesContext';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
+  metadataBase: new URL('https://babynamegenerator.xyz'),
   title: {
     default: 'BNG Baby Name Generator - AI-Powered Baby Names | Free & Meaningful',
     template: '%s | BNG Baby Name Generator'
@@ -45,7 +46,7 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://baby-name-generator-afzal.vercel.app',
+    url: 'https://babynamegenerator.xyz',
     title: 'BNG Baby Name Generator - AI-Powered Baby Names',
     description: 'Discover beautiful, meaningful baby names with our AI-powered generator. Get personalized suggestions for 7+ religions and multiple styles.',
     siteName: 'BNG Baby Name Generator',
@@ -67,11 +68,17 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
+  alternates: {
+    canonical: 'https://babynamegenerator.xyz',
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="canonical" href="https://babynamegenerator.xyz" />
+      </head>
       <body className={inter.className}>
         <ThemeProvider>
           <FavoritesProvider>
