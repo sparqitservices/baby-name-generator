@@ -29,7 +29,7 @@ export default function Footer() {
             </p>
             <div className="flex gap-4">
               <a 
-                href="https://github.com/afzalhameed" 
+                href="https://github.com/sparqitservices" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-colors"
@@ -37,7 +37,7 @@ export default function Footer() {
                 <Github className="w-5 h-5" />
               </a>
               <a 
-                href="https://linkedin.com/in/afzalhameed" 
+                href="https://www.linkedin.com/company/sparq-it-services/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-colors"
@@ -52,12 +52,7 @@ export default function Footer() {
               >
                 <Twitter className="w-5 h-5" />
               </a>
-              <a 
-                href="mailto:contact@sparqitservices.com"
-                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-colors"
-              >
-                <Mail className="w-5 h-5" />
-              </a>
+              
             </div>
           </div>
 
@@ -83,7 +78,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/afzalhameed/baby-name-generator" 
+                  href="https://github.com/sparqitservices/baby-name-generator" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="hover:text-indigo-400 transition-colors flex items-center gap-2"
@@ -124,21 +119,21 @@ export default function Footer() {
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-center md:text-left">
-              © 2025 BNG Baby Name Generator. Free & Open Source.
+              No copyrights, just good vibes and zero drama.
             </p>
             <p className="text-gray-400 text-center md:text-right">
               Built with ❤️ by{' '}
               <a 
-                href="https://www.sparqitservices.com" 
+                href="https://x.com/iafzalhameed" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
               >
-                Afzal Hameed
+                Afzal
               </a>
               {' '}at{' '}
               <a 
-                href="https://www.sparqitservices.com" 
+                href="https://sparqitservices.com/?utm_source=babynamegenerator&utm_medium=aitool&utm_campaign=afzal_sparqit&utm_content=bngbabynames" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-purple-400 hover:text-purple-300 font-semibold transition-colors"

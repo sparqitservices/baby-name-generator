@@ -1,3 +1,5 @@
+
+
 // app/favorites/page.jsx
 'use client';
 
@@ -5,6 +7,17 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 import NameCard from '@/components/NameCard';
 import { Download, FileJson, Printer, Trash2 } from 'lucide-react';
 import { exportToCSV, exportToJSON, printFavorites } from '@/utils/exportFavorites';
+
+export const metadata = {
+  title: 'Favorite Baby Names',
+  description: 'View and manage your favorite baby names saved from our AI-powered generator.',
+  openGraph: {
+    title: 'Favorite Baby Names | BNG Baby Name Generator',
+    description: 'View and manage your favorite baby names.',
+  },
+};
+
+// ... rest of the code
 
 export default function FavoritesPage() {
   const { favorites, toggleFavorite, clearFavorites } = useFavorites();
