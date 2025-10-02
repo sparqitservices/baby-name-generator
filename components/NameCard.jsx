@@ -1,25 +1,19 @@
 'use client';
 import { useState } from 'react';
-import { Heart, Copy, Check } from 'lucide-react';
-import { useFavorites } from '@/contexts/FavoritesContext';
+import { Copy, Check, Heart } from 'lucide-react';
 
 export default function NameCard({ name }) {
-  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const [copied, setCopied] = useState(false);
-  const favorite = isFavorite(name.name);
-
-  const handleFavorite = () => {
-    if (favorite) {
-      removeFavorite(name.name);
-    } else {
-      addFavorite(name);
-    }
-  };
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(name.name);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleFavorite = () => {
+    setIsFavorite(!isFavorite);
   };
 
   const genderColors = {
@@ -39,15 +33,15 @@ export default function NameCard({ name }) {
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className={`text-3xl font-bold bg-gradient-to-r ${genderColors[name.gender]} bg-clip-text text-transparent`}>
+            <h3 className={`text-3xl font-bold bg-gradient-to-r ${genderColors[name.gender || 'any']} bg-clip-text text-transparent`}>
               {name.name}
             </h3>
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${genderBg[name.gender]}`}>
-              {name.gender === 'any' ? 'Unisex' : name.gender.charAt(0).toUpperCase() + name.gender.slice(1)}
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${genderBg[name.gender || 'any']}`}>
+              {name.gender === 'any' ? 'Unisex' : (name.gender || 'Any').charAt(0).toUpperCase() + (name.gender || 'any').slice(1)}
             </span>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-            {name.origin}
+            {name.origin || 'Traditional'}
           </p>
         </div>
         <div className="flex gap-2">
@@ -65,15 +59,15 @@ export default function NameCard({ name }) {
           <button
             onClick={handleFavorite}
             className={`p-2 rounded-lg transition-all ${
-              favorite
+              isFavorite
                 ? 'bg-red-100 dark:bg-red-900/30'
                 : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
-            title={favorite ? 'Remove from favorites' : 'Add to favorites'}
+            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
             <Heart
               className={`w-5 h-5 transition-all ${
-                favorite
+                isFavorite
                   ? 'fill-red-500 text-red-500'
                   : 'text-gray-600 dark:text-gray-400'
               }`}
@@ -82,7 +76,7 @@ export default function NameCard({ name }) {
         </div>
       </div>
       <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-        {name.meaning}
+        {name.meaning || 'A beautiful and meaningful name'}
       </p>
     </div>
   );
