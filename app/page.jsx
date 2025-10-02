@@ -19,7 +19,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          count: isMore ? 10 : formData.count // 10 for "Generate More", otherwise use form count
+          count: isMore ? 10 : formData.count
         })
       });
 
@@ -34,16 +34,12 @@ export default function Home() {
       }
 
       if (isMore) {
-        // Append new names to existing ones
         setNames(prev => [...prev, ...data.names]);
       } else {
-        // Replace with new names
         setNames(data.names);
       }
 
-      // Save form data for "Generate More"
       setLastFormData(formData);
-
       return data.names;
 
     } catch (err) {
@@ -81,7 +77,7 @@ export default function Home() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {/* Form Section - LEFT SIDE ONLY */}
+          {/* Form Section */}
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sticky top-8">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
@@ -95,13 +91,20 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Results Section - RIGHT SIDE ONLY */}
+          {/* Results Section */}
           <div className="lg:col-span-2">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 border-t-transparent mb-4"></div>
-                <p className="text-lg text-gray-600 dark:text-gray-300">
-                  Generating beautiful names...
+              // LOADING INDICATOR ON RIGHT SIDE
+              <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                <div className="relative">
+                  <div className="animate-spin rounded-full h-20 w-20 border-4 border-indigo-200 dark:border-indigo-900"></div>
+                  <div className="animate-spin rounded-full h-20 w-20 border-4 border-indigo-600 border-t-transparent absolute top-0 left-0"></div>
+                </div>
+                <p className="text-lg font-semibold text-gray-800 dark:text-white mt-6">
+                  Generating Beautiful Names...
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  This may take a few seconds
                 </p>
               </div>
             ) : names.length > 0 ? (
