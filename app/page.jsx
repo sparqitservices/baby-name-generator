@@ -4,14 +4,68 @@ import Navbar from '@/components/Navbar';
 import NameForm from '@/components/NameForm';
 import NameCard from '@/components/NameCard';
 import Footer from '@/components/Footer';
+import { Sparkles, Loader2 } from 'lucide-react';
 
 export default function Home() {
   const [names, setNames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [lastFormData, setLastFormData] = useState(null);
+
+  const generateNames = async (formData, isMore = false) => {
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          count: 10 // Always generate 10 names for "Generate More"
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `Server error: ${response.status}`);
+      }
+
+      if (!data.names || data.names.length === 0) {
+        throw new Error('No names generated. Please try again.');
+      }
+
+      if (isMore) {
+        // Append new names to existing ones
+        setNames(prev => [...prev, ...data.names]);
+      } else {
+        // Replace with new names
+        setNames(data.names);
+      }
+
+      // Save form data for "Generate More"
+      setLastFormData(formData);
+
+    } catch (err) {
+      console.error('❌ Generation error:', err);
+      throw err;
+    }
+  };
 
   const handleGenerate = (generatedNames) => {
     setNames(generatedNames);
     setIsLoading(false);
+  };
+
+  const handleGenerateMore = async () => {
+    if (!lastFormData) return;
+
+    setIsLoadingMore(true);
+    try {
+      await generateNames(lastFormData, true);
+    } catch (error) {
+      alert(error.message || 'Failed to generate more names');
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
 
   return (
@@ -39,6 +93,9 @@ export default function Home() {
               <NameForm 
                 onGenerate={handleGenerate} 
                 isLoading={isLoading}
+                onFormDataChange={setLastFormData}
+                generateNames={generateNames}
+                setIsLoading={setIsLoading}
               />
             </div>
           </div>
@@ -63,6 +120,27 @@ export default function Home() {
                   {names.map((name, index) => (
                     <NameCard key={`${name.name}-${index}`} name={name} />
                   ))}
+                </div>
+
+                {/* Generate More Button */}
+                <div className="flex justify-center mt-8 mb-4">
+                  <button
+                    onClick={handleGenerateMore}
+                    disabled={isLoadingMore}
+                    className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-3"
+                  >
+                    {isLoadingMore ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Generating More...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-5 h-5" />
+                        <span>Generate 10 More Names</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             ) : (

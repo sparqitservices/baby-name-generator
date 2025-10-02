@@ -1,131 +1,182 @@
 'use client';
 import { useState } from 'react';
-import { Heart, Volume2, Copy, Share2 } from 'lucide-react';
-import { useFavorites } from '@/contexts/FavoritesContext';
+import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 
-export default function NameCard({ name }) {
-  const { favorites, addFavorite, removeFavorite } = useFavorites();
-  const [copied, setCopied] = useState(false);
-  
-  const isFavorite = favorites.some(fav => fav.name === name.name);
+export default function NameForm({ onGenerate, isLoading, generateNames, setIsLoading, onFormDataChange }) {
+  const [formData, setFormData] = useState({
+    gender: 'any',
+    religion: 'muslim',
+    style: 'modern',
+    count: 20
+  });
+  const [error, setError] = useState(null);
 
-  const handleFavorite = () => {
-    if (isFavorite) {
-      removeFavorite(name.name);
-    } else {
-      addFavorite(name);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    // Save form data for "Generate More"
+    if (onFormDataChange) {
+      onFormDataChange(formData);
+    }
+
+    try {
+      await generateNames(formData, false);
+    } catch (err) {
+      console.error('❌ Generation error:', err);
+      setError(err.message || 'Failed to generate names. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(name.name);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: name.name,
-          text: `${name.name} - ${name.meaning}`,
-        });
-      } catch (err) {
-        console.log('Share cancelled');
-      }
-    } else {
-      handleCopy();
-    }
-  };
-
-  const handlePronounce = () => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(name.name);
-      utterance.rate = 0.8;
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
-  const getGenderColor = (gender) => {
-    switch (gender?.toLowerCase()) {
-      case 'boy':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
-      case 'girl':
-        return 'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300';
-      default:
-        return 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300';
-    }
-  };
-
-  const getGenderIcon = (gender) => {
-    switch (gender?.toLowerCase()) {
-      case 'boy':
-        return '👦';
-      case 'girl':
-        return '👧';
-      default:
-        return '👶';
-    }
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border-2 border-gray-100 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {name.name}
-          </h3>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getGenderColor(name.gender)}`}>
-              {getGenderIcon(name.gender)} {name.gender?.charAt(0).toUpperCase() + name.gender?.slice(1)}
-            </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
-              {name.origin}
-            </span>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Gender Selection */}
+      <div className="space-y-3">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+          Gender
+        </label>
+        <div className="grid grid-cols-3 gap-3">
+          {['boy', 'girl', 'any'].map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setFormData({ ...formData, gender: option })}
+              disabled={isLoading}
+              className={`px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                formData.gender === option
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg scale-105'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-gray-200 dark:border-gray-700'
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {option.charAt(0).toUpperCase() + option.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Religion Selection */}
+      <div className="space-y-3">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+          Religion / Culture
+        </label>
+        <select
+          name="religion"
+          value={formData.religion}
+          onChange={handleChange}
+          disabled={isLoading}
+          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <option value="muslim">Muslim / Islamic</option>
+          <option value="hindu">Hindu / Vedic</option>
+          <option value="christian">Christian / Biblical</option>
+          <option value="sikh">Sikh / Punjabi</option>
+          <option value="buddhist">Buddhist / Dharmic</option>
+          <option value="jain">Jain / Jainism</option>
+          <option value="jewish">Jewish / Hebrew</option>
+        </select>
+      </div>
+
+      {/* Style Selection */}
+      <div className="space-y-3">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+          Style
+        </label>
+        <select
+          name="style"
+          value={formData.style}
+          onChange={handleChange}
+          disabled={isLoading}
+          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <option value="modern">Modern & Trendy</option>
+          <option value="traditional">Traditional & Classic</option>
+          <option value="unique">Unique & Rare</option>
+          <option value="spiritual">Spiritual & Meaningful</option>
+          <option value="royal">Royal & Elegant</option>
+          <option value="nature">Nature-Inspired</option>
+        </select>
+      </div>
+
+      {/* Number of Names */}
+      <div className="space-y-3">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+          Number of Names: <span className="text-indigo-600 dark:text-indigo-400">{formData.count}</span>
+        </label>
+        <input
+          type="range"
+          name="count"
+          min="5"
+          max="50"
+          step="5"
+          value={formData.count}
+          onChange={handleChange}
+          disabled={isLoading}
+          className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+          <span>5</span>
+          <span>25</span>
+          <span>50</span>
+        </div>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl animate-shake">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-red-800 dark:text-red-200 mb-1">
+                Generation Failed
+              </h4>
+              <p className="text-sm text-red-700 dark:text-red-300">
+                {error}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setError(null)}
+              className="text-red-400 hover:text-red-600 dark:hover:text-red-200 transition-colors"
+            >
+              ✕
+            </button>
           </div>
         </div>
-        <button
-          onClick={handleFavorite}
-          className={`p-2 rounded-full transition-all duration-200 ${
-            isFavorite
-              ? 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300'
-              : 'bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 hover:bg-red-50 hover:text-red-500'
-          }`}
-          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-        >
-          <Heart
-            className={`w-6 h-6 ${isFavorite ? 'fill-current' : ''}`}
-          />
-        </button>
-      </div>
+      )}
 
-      <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-        {name.meaning}
+      {/* Generate Button */}
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span>Generating Amazing Names...</span>
+          </>
+        ) : (
+          <>
+            <Sparkles className="w-5 h-5" />
+            <span>Generate Names</span>
+          </>
+        )}
+      </button>
+
+      {/* Info Text */}
+      <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+        Powered by AI • {formData.count} unique names will be generated
       </p>
-
-      <div className="flex items-center gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <button
-          onClick={handlePronounce}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
-        >
-          <Volume2 className="w-4 h-4" />
-          Pronounce
-        </button>
-        <button
-          onClick={handleCopy}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
-        >
-          <Copy className="w-4 h-4" />
-          {copied ? 'Copied!' : 'Copy'}
-        </button>
-        <button
-          onClick={handleShare}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
-        >
-          <Share2 className="w-4 h-4" />
-          Share
-        </button>
-      </div>
-    </div>
+    </form>
   );
 }
