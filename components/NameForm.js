@@ -1,13 +1,13 @@
 'use client';
 import { useState } from 'react';
-import { Sparkles, RefreshCw } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
-export default function NameForm({ onGenerate, onRegenerate, hasResults }) {
+export default function NameForm({ onGenerate }) {
   const [params, setParams] = useState({
     gender: 'any',
     religion: 'muslim',
     style: 'modern',
-    count: 10
+    count: 20
   });
 
   const [loading, setLoading] = useState(false);
@@ -19,18 +19,12 @@ export default function NameForm({ onGenerate, onRegenerate, hasResults }) {
     setLoading(false);
   };
 
-  const handleRegenerate = async () => {
-    setLoading(true);
-    await onRegenerate(params);
-    setLoading(false);
-  };
-
   return (
     <div className="relative">
       {/* Animated background gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl blur-2xl opacity-20 animate-pulse"></div>
       
-      <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 mb-8 border border-gray-200 dark:border-gray-700">
+      <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-gray-200 dark:border-gray-700">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Gender */}
@@ -98,18 +92,6 @@ export default function NameForm({ onGenerate, onRegenerate, hasResults }) {
             <span className="text-lg">{loading ? 'Generating Magic...' : 'Generate Names'}</span>
           </button>
         </form>
-
-        {/* Regenerate Button */}
-        {hasResults && (
-          <button
-            onClick={handleRegenerate}
-            disabled={loading}
-            className="w-full mt-4 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-2xl transform hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-            <span className="text-lg">{loading ? 'Regenerating...' : 'Regenerate Names'}</span>
-          </button>
-        )}
       </div>
     </div>
   );

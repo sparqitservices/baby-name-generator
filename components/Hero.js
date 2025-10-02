@@ -1,49 +1,51 @@
-"use client";
+import Logo from './Logo';
 
-import Link from 'next/link'
-import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
-
-export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-
+export default function Hero() {
   return (
-    <nav className="bg-primary-500 text-white shadow-md fixed w-full z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          {/* Logo */}
-          <Link href="/" className="text-2xl font-bold tracking-wide hover:text-primary-200">
-            BabyNameAI
-          </Link>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-8">
-            <Link href="/" className="hover:text-primary-200">Home</Link>
-            <Link href="/generate" className="hover:text-primary-200">Generate</Link>
-            <Link href="/about" className="hover:text-primary-200">About</Link>
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
-              className="focus:outline-none"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
+    <div className="text-center mb-16 space-y-6">
+      <div className="flex justify-center mb-6 animate-fade-in">
+        <Logo size="large" />
+      </div>
+      
+      <h1 className="text-6xl md:text-7xl font-black text-gray-900 dark:text-white mb-6 animate-fade-in-up">
+        <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
+          AI Baby Name Generator
+        </span>
+      </h1>
+      
+      {/* Baby Image */}
+      <div className="flex justify-center my-8 animate-fade-in-up animation-delay-200">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+          <img 
+            src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&h=400&fit=crop" 
+            alt="Cute baby" 
+            className="relative w-48 h-48 rounded-full object-cover shadow-2xl border-4 border-white dark:border-gray-800 transform hover:scale-105 transition-transform duration-300"
+          />
         </div>
       </div>
+      
+      <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-400">
+        Discover beautiful, meaningful names for your baby with{' '}
+        <span className="font-bold text-indigo-600 dark:text-indigo-400">AI-powered suggestions</span>{' '}
+        tailored to your preferences
+      </p>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden bg-primary-600 px-4 pt-2 pb-4 space-y-1">
-          <Link href="/" className="block py-2 hover:text-primary-200">Home</Link>
-          <Link href="/generate" className="block py-2 hover:text-primary-200">Generate</Link>
-          <Link href="/about" className="block py-2 hover:text-primary-200">About</Link>
+      {/* Stats */}
+      <div className="flex flex-wrap justify-center gap-8 mt-12 animate-fade-in-up animation-delay-600">
+        <div className="text-center">
+          <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400">20+</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Names per search</div>
         </div>
-      )}
-    </nav>
-  )
+        <div className="text-center">
+          <div className="text-4xl font-bold text-purple-600 dark:text-purple-400">7</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Religions</div>
+        </div>
+        <div className="text-center">
+          <div className="text-4xl font-bold text-pink-600 dark:text-pink-400">∞</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Possibilities</div>
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -1,6 +1,6 @@
 export async function POST(request) {
   try {
-    const { gender, religion, style, count = 10 } = await request.json();
+    const { gender, religion, style, count = 20 } = await request.json();
 
     console.log('📝 Request params:', { gender, religion, style, count });
 
@@ -73,7 +73,8 @@ Return ONLY a valid JSON array of objects. Example format:
     } catch (apiError) {
       console.error('❌ API call failed:', apiError.message);
       // Return fallback data
-      return Response.json({ names: getFallbackNames(gender, religion) });
+      
+      return Response.json({ names: getFallbackNames(gender, religion, count) });
     }
 
   } catch (error) {
@@ -85,7 +86,7 @@ Return ONLY a valid JSON array of objects. Example format:
   }
 }
 
-function getFallbackNames(gender, religion) {
+function getFallbackNames(gender, religion, count = 20) {
   const fallback = {
     muslim: {
       boy: [
@@ -316,5 +317,11 @@ function getFallbackNames(gender, religion) {
   const religionData = fallback[religion] || fallback.muslim;
   const genderData = religionData[gender] || religionData.boy;
   
-  return genderData.slice(0, 10);
+// Return requested count, repeat if needed
+  let result = [...genderData];
+  while (result.length < count) {
+    result = [...result, ...genderData];
+  }
+  
+  return result.slice(0, count);
 }
