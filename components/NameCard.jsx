@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 
-export default function NameForm({ onGenerate, isLoading, generateNames, setIsLoading, onFormDataChange }) {
+export default function NameForm({ generateNames, setIsLoading, isLoading }) {
   const [formData, setFormData] = useState({
     gender: 'any',
     religion: 'muslim',
@@ -15,11 +15,6 @@ export default function NameForm({ onGenerate, isLoading, generateNames, setIsLo
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-
-    // Save form data for "Generate More"
-    if (onFormDataChange) {
-      onFormDataChange(formData);
-    }
 
     try {
       await generateNames(formData, false);

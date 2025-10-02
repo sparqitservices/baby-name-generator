@@ -19,7 +19,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          count: 10 // Always generate 10 names for "Generate More"
+          count: isMore ? 10 : formData.count // 10 for "Generate More", otherwise use form count
         })
       });
 
@@ -44,15 +44,12 @@ export default function Home() {
       // Save form data for "Generate More"
       setLastFormData(formData);
 
+      return data.names;
+
     } catch (err) {
       console.error('❌ Generation error:', err);
       throw err;
     }
-  };
-
-  const handleGenerate = (generatedNames) => {
-    setNames(generatedNames);
-    setIsLoading(false);
   };
 
   const handleGenerateMore = async () => {
@@ -84,23 +81,21 @@ export default function Home() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {/* Form Section */}
+          {/* Form Section - LEFT SIDE ONLY */}
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sticky top-8">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
                 Customize Your Search
               </h2>
               <NameForm 
-                onGenerate={handleGenerate} 
-                isLoading={isLoading}
-                onFormDataChange={setLastFormData}
                 generateNames={generateNames}
                 setIsLoading={setIsLoading}
+                isLoading={isLoading}
               />
             </div>
           </div>
 
-          {/* Results Section */}
+          {/* Results Section - RIGHT SIDE ONLY */}
           <div className="lg:col-span-2">
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-20">
@@ -116,6 +111,8 @@ export default function Home() {
                     {names.length} Names Generated
                   </h2>
                 </div>
+                
+                {/* NAME CARDS */}
                 <div className="grid gap-4">
                   {names.map((name, index) => (
                     <NameCard key={`${name.name}-${index}`} name={name} />
