@@ -1,5 +1,5 @@
 const ABACUS_ENDPOINT =
-  process.env.ABACUS_API_URL ?? 'https://api.abacus.ai/api/v0/generateText';
+  process.env.ABACUS_API_URL ?? 'https://api.abacus.ai/api/v0/chatLLM';
 
 const ALLOWED_GENDERS = new Set(['boy', 'girl', 'any']);
 const ALLOWED_RELIGIONS = new Set([
@@ -49,7 +49,7 @@ export async function POST(request) {
       });
     }
 
-    console.log('🔑 API key detected.');
+    console.log('🔑 API key detected:', apiKey.substring(0, 15) + '...');
 
     const prompt = buildPrompt({
       gender: normalizedGender,
@@ -58,16 +58,22 @@ export async function POST(request) {
       count: normalizedCount
     });
 
-    console.log('🚀 Calling Abacus API…');
+    console.log('🚀 Calling Abacus API at:', ABACUS_ENDPOINT);
 
+    // Try ChatLLM format
     const response = await fetch(ABACUS_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        prompt,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
         model: 'gpt-4o',
         temperature: 0.9,
         max_tokens: 4000
@@ -80,6 +86,11 @@ export async function POST(request) {
     if (!response.ok) {
       const errorText = await safeReadText(response);
       console.error('❌ API error payload:', errorText);
+      console.error('❌ Full response:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries())
+      });
       return Response.json({
         names: getFallbackNames(normalizedGender, normalizedReligion, Math.min(normalizedCount, 10)),
         isApiWorking: false,
@@ -88,11 +99,25 @@ export async function POST(request) {
     }
 
     const payload = await response.json();
-    const parsedNames = extractNames(payload.text, normalizedCount);
+    console.log('✅ API Response:', JSON.stringify(payload).substring(0, 300));
+
+    // Extract text from ChatLLM response
+    let responseText = '';
+    if (payload.choices && payload.choices[0]?.message?.content) {
+      responseText = payload.choices[0].message.content;
+    } else if (payload.text) {
+      responseText = payload.text;
+    } else if (payload.content) {
+      responseText = payload.content;
+    }
+
+    console.log('📄 Extracted text:', responseText.substring(0, 200));
+
+    const parsedNames = extractNames(responseText, normalizedCount);
 
     if (parsedNames.length === 0) {
       console.warn('⚠️ No valid names parsed from Abacus response.');
-      console.debug('🔍 Raw response text snapshot:', payload.text?.slice(0, 400));
+      console.debug('🔍 Raw response text:', responseText.substring(0, 500));
       return Response.json({
         names: getFallbackNames(normalizedGender, normalizedReligion, Math.min(normalizedCount, 10)),
         isApiWorking: false,
@@ -107,6 +132,7 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error('❌ Unhandled server error:', error);
+    console.error('❌ Error stack:', error.stack);
     const { gender = 'any', religion = 'muslim', count = 20 } = await request.json().catch(() => ({}));
     return Response.json({
       names: getFallbackNames(gender, religion, Math.min(count, 10)),
@@ -228,8 +254,8 @@ function getFallbackNames(gender, religion, count = 10) {
         { name: 'Hadi', meaning: 'Guide, leader, calm', origin: 'Arabic', gender: 'any' },
         { name: 'Nur', meaning: 'Light, brightness', origin: 'Arabic', gender: 'any' },
         { name: 'Salam', meaning: 'Peace, safety, security', origin: 'Arabic', gender: 'any' },
-        { name: 'Amin', meaning: 'Faithful, trustworthy', origin: 'Arabic', gender: 'any' },
-        { name: 'Basil', meaning: 'Brave, fearless', origin: 'Arabic', gender: 'any' }
+        { name: 'Basil', meaning: 'Brave, fearless', origin: 'Arabic', gender: 'any' },
+        { name: 'Karim', meaning: 'Generous, noble', origin: 'Arabic', gender: 'any' }
       ]
     },
     hindu: {
