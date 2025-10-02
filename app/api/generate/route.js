@@ -1,5 +1,5 @@
 const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = 'llama-3.3-70b-versatile'; // Fast and accurate
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 const ALLOWED_GENDERS = new Set(['boy', 'girl', 'any']);
 const ALLOWED_RELIGIONS = new Set([
@@ -11,6 +11,21 @@ const ALLOWED_RELIGIONS = new Set([
   'jain',
   'jewish'
 ]);
+
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Handle OPTIONS request for CORS preflight
+export async function OPTIONS(request) {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
 
 export async function POST(request) {
   try {
@@ -27,9 +42,12 @@ export async function POST(request) {
     // Check API key
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
-      return Response.json(
-        { error: 'API key not configured. Please add GROQ_API_KEY to environment variables.' },
-        { status: 500 }
+      return new Response(
+        JSON.stringify({ error: 'API key not configured. Please add GROQ_API_KEY to environment variables.' }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
       );
     }
 
@@ -75,9 +93,12 @@ export async function POST(request) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ API Error:', errorText);
-      return Response.json(
-        { error: `API request failed: ${response.status} ${response.statusText}` },
-        { status: response.status }
+      return new Response(
+        JSON.stringify({ error: `API request failed: ${response.status} ${response.statusText}` }),
+        { 
+          status: response.status,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
       );
     }
 
@@ -88,9 +109,12 @@ export async function POST(request) {
     const content = data.choices?.[0]?.message?.content;
     if (!content) {
       console.error('❌ No content in response');
-      return Response.json(
-        { error: 'No content received from API' },
-        { status: 500 }
+      return new Response(
+        JSON.stringify({ error: 'No content received from API' }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
       );
     }
 
@@ -101,29 +125,44 @@ export async function POST(request) {
 
     if (names.length === 0) {
       console.error('❌ Failed to parse names from response');
-      return Response.json(
-        { error: 'Failed to parse names from AI response. Please try again.' },
-        { status: 500 }
+      return new Response(
+        JSON.stringify({ error: 'Failed to parse names from AI response. Please try again.' }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
       );
     }
 
     console.log(`🎉 Returning ${names.length} names`);
-    return Response.json({ names, count: names.length });
+    return new Response(
+      JSON.stringify({ names, count: names.length }),
+      { 
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
 
   } catch (error) {
     console.error('❌ Server error:', error.message);
     console.error('Stack:', error.stack);
     
     if (error.name === 'AbortError') {
-      return Response.json(
-        { error: 'Request timeout. Please try again.' },
-        { status: 504 }
+      return new Response(
+        JSON.stringify({ error: 'Request timeout. Please try again.' }),
+        { 
+          status: 504,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
       );
     }
 
-    return Response.json(
-      { error: 'Internal server error. Please try again later.' },
-      { status: 500 }
+    return new Response(
+      JSON.stringify({ error: 'Internal server error. Please try again later.' }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     );
   }
 }

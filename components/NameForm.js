@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 
-export default function NameForm({ onGenerate, isLoading }) {
+export default function NameForm({ generateNames, setIsLoading, isLoading }) {
   const [formData, setFormData] = useState({
     gender: 'any',
     religion: 'muslim',
@@ -14,38 +14,25 @@ export default function NameForm({ onGenerate, isLoading }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
 
     try {
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || `Server error: ${response.status}`);
-      }
-
-      if (!data.names || data.names.length === 0) {
-        throw new Error('No names generated. Please try again.');
-      }
-
-      // Pass names to parent component
-      onGenerate(data.names);
-      
+      const result = await generateNames(formData, false);
+      console.log('✅ Names generated:', result);
     } catch (err) {
       console.error('❌ Generation error:', err);
       setError(err.message || 'Failed to generate names. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -60,7 +47,7 @@ export default function NameForm({ onGenerate, isLoading }) {
             <button
               key={option}
               type="button"
-              onClick={() => setFormData({ ...formData, gender: option })}
+              onClick={() => setFormData(prev => ({ ...prev, gender: option }))}
               disabled={isLoading}
               className={`px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                 formData.gender === option
@@ -142,7 +129,7 @@ export default function NameForm({ onGenerate, isLoading }) {
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl animate-shake">
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
