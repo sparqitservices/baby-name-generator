@@ -4,6 +4,7 @@ import NameForm from '../components/NameForm';
 import NameCard from '../components/NameCard';
 import Hero from '../components/Hero';
 import { Plus, AlertCircle } from 'lucide-react';
+import Footer from '../components/Footer';
 
 export default function Home() {
   const [names, setNames] = useState([]);
@@ -163,6 +164,8 @@ export default function Home() {
           </div>
         </div>
       )}
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
