@@ -3,12 +3,13 @@ import { useState } from 'react';
 import NameForm from '../components/NameForm';
 import NameCard from '../components/NameCard';
 import Hero from '../components/Hero';
-import { Plus } from 'lucide-react';
+import { Plus, AlertCircle } from 'lucide-react';
 
 export default function Home() {
   const [names, setNames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentParams, setCurrentParams] = useState(null);
+  const [isApiWorking, setIsApiWorking] = useState(true);
 
   const generateNames = async (params) => {
     setLoading(true);
@@ -21,6 +22,7 @@ export default function Home() {
       });
       const data = await response.json();
       setNames(data.names || []);
+      setIsApiWorking(data.isApiWorking !== false);
       
       // Scroll to results
       setTimeout(() => {
@@ -28,6 +30,7 @@ export default function Home() {
       }, 100);
     } catch (error) {
       console.error('Error:', error);
+      setIsApiWorking(false);
     }
     setLoading(false);
   };
@@ -35,19 +38,41 @@ export default function Home() {
   const generateMore = async () => {
     if (!currentParams) return;
     
+    // Check limits
+    if (!isApiWorking && names.length >= 10) {
+      alert('API is not working. Maximum 10 names in fallback mode.');
+      return;
+    }
+    
+    if (isApiWorking && names.length >= 100) {
+      alert('Maximum 100 names reached!');
+      return;
+    }
+    
     setLoading(true);
     try {
+      const countToGenerate = isApiWorking ? 10 : Math.min(10 - names.length, 10);
+      
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...currentParams, count: 10 })
+        body: JSON.stringify({ ...currentParams, count: countToGenerate })
       });
       const data = await response.json();
-      setNames([...names, ...(data.names || [])]);
+      
+      const newNames = [...names, ...(data.names || [])];
+      const maxNames = isApiWorking ? 100 : 10;
+      setNames(newNames.slice(0, maxNames));
+      setIsApiWorking(data.isApiWorking !== false);
     } catch (error) {
       console.error('Error:', error);
     }
     setLoading(false);
+  };
+
+  const canGenerateMore = () => {
+    if (!isApiWorking) return names.length < 10;
+    return names.length < 100;
   };
 
   return (
@@ -69,6 +94,19 @@ export default function Home() {
       {names.length > 0 && (
         <div id="results" className="relative z-10 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm py-16 px-4">
           <div className="max-w-7xl mx-auto">
+            {/* API Status Warning */}
+            {!isApiWorking && (
+              <div className="mb-8 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-lg animate-fade-in">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                  <div>
+                    <p className="font-semibold text-yellow-800 dark:text-yellow-200">API Offline - Fallback Mode</p>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">Showing limited results (max 10 names). API connection required for full features.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {loading && names.length === 0 ? (
               <div className="text-center py-20 animate-fade-in">
                 <div className="relative inline-block">
@@ -83,7 +121,7 @@ export default function Home() {
               <div className="animate-fade-in-up">
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                    Generated Names ({names.length})
+                    Generated Names ({names.length}{isApiWorking ? '/100' : '/10'})
                   </h2>
                 </div>
                 
@@ -100,16 +138,26 @@ export default function Home() {
                 </div>
 
                 {/* Generate More Button */}
-                <div className="flex justify-center">
-                  <button
-                    onClick={generateMore}
-                    disabled={loading}
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-2xl transform hover:scale-105 active:scale-95"
-                  >
-                    <Plus className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} />
-                    <span className="text-lg">{loading ? 'Generating...' : 'Generate More (10)'}</span>
-                  </button>
-                </div>
+                {canGenerateMore() && (
+                  <div className="flex justify-center">
+                    <button
+                      onClick={generateMore}
+                      disabled={loading}
+                      className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-2xl transform hover:scale-105 active:scale-95"
+                    >
+                      <Plus className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} />
+                      <span className="text-lg">{loading ? 'Generating...' : 'Generate More (10)'}</span>
+                    </button>
+                  </div>
+                )}
+
+                {!canGenerateMore() && (
+                  <div className="text-center py-8">
+                    <p className="text-xl font-semibold text-gray-600 dark:text-gray-400">
+                      {isApiWorking ? '🎉 Maximum 100 names reached!' : '⚠️ Maximum 10 names in fallback mode'}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
