@@ -1,86 +1,166 @@
 'use client';
-import { useFavorites } from '../../contexts/FavoritesContext';
-import NameCard from '../../components/NameCard';
-import { Download, FileJson, Printer, Trash2 } from 'lucide-react';
-import { exportToCSV, exportToJSON, printFavorites } from '../../utils/exportFavorites';
+import { useFavorites } from '@/contexts/FavoritesContext';
+import Navbar from '@/components/Navbar';
+import NameCard from '@/components/NameCard';
+import Footer from '@/components/Footer';
+import { Download, FileJson, Printer, Trash2, ArrowLeft, Heart } from 'lucide-react';
+import Link from 'next/link';
 
 export default function FavoritesPage() {
   const { favorites, clearFavorites } = useFavorites();
 
   const handleExportCSV = () => {
-    exportToCSV(favorites);
+    if (favorites.length === 0) return;
+
+    const headers = ['Name', 'Gender', 'Origin', 'Meaning'];
+    const rows = favorites.map(name => [
+      name.name,
+      name.gender,
+      name.origin,
+      name.meaning
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `favorite-baby-names-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const handleExportJSON = () => {
-    exportToJSON(favorites);
+    if (favorites.length === 0) return;
+
+    const jsonContent = JSON.stringify(favorites, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `favorite-baby-names-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const handlePrint = () => {
-    printFavorites(favorites);
+    window.print();
+  };
+
+  const handleClearAll = () => {
+    if (confirm('Are you sure you want to clear all favorites? This action cannot be undone.')) {
+      clearFavorites();
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900 py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Favorite Names ({favorites.length})
-          </h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
+      <Navbar />
+      
+      <main className="container mx-auto px-4 py-8 flex-grow">
+        {/* Header with Back Button */}
+        <div className="mb-8">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-md hover:shadow-lg"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to Home</span>
+          </Link>
 
-          {favorites.length > 0 && (
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={handleExportCSV}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-              >
-                <Download className="w-4 h-4" />
-                Export CSV
-              </button>
-              <button
-                onClick={handleExportJSON}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-              >
-                <FileJson className="w-4 h-4" />
-                Export JSON
-              </button>
-              <button
-                onClick={handlePrint}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-              >
-                <Printer className="w-4 h-4" />
-                Print
-              </button>
-              <button
-                onClick={clearFavorites}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-                Clear All
-              </button>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                Favorite Names ({favorites.length})
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                {favorites.length === 0 
+                  ? 'No favorites yet. Start adding names you love!' 
+                  : 'Your collection of beautiful baby names'}
+              </p>
             </div>
-          )}
+
+            {favorites.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition-colors shadow-md hover:shadow-lg"
+                >
+                  <Download className="w-4 h-4" />
+                  Export CSV
+                </button>
+                <button
+                  onClick={handleExportJSON}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors shadow-md hover:shadow-lg"
+                >
+                  <FileJson className="w-4 h-4" />
+                  Export JSON
+                </button>
+                <button
+                  onClick={handlePrint}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors shadow-md hover:shadow-lg"
+                >
+                  <Printer className="w-4 h-4" />
+                  Print
+                </button>
+                <button
+                  onClick={handleClearAll}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition-colors shadow-md hover:shadow-lg"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Clear All
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        {favorites.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">💝</div>
-            <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              No favorites yet
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Start adding names to your favorites from the generator!
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Favorites Grid */}
+        {favorites.length > 0 ? (
+          <div className="grid gap-4 max-w-5xl mx-auto">
             {favorites.map((name, index) => (
-              <div key={index} className="animate-fade-in-up">
-                <NameCard name={name} />
-              </div>
+              <NameCard key={`${name.name}-${index}`} name={name} />
             ))}
           </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-24 h-24 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 rounded-full flex items-center justify-center mb-6">
+              <Heart className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+              No Favorites Yet
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 max-w-md mb-6">
+              Start exploring baby names and click the heart icon to save your favorites here.
+            </p>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Go to Home
+            </Link>
+          </div>
         )}
-      </div>
+      </main>
+
+      <Footer />
+
+      {/* Print Styles */}
+      <style jsx global>{`
+        @media print {
+          nav, footer, button {
+            display: none !important;
+          }
+          .container {
+            max-width: 100% !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
