@@ -17,8 +17,8 @@ export default function NameForm({ generateNames, setIsLoading, isLoading }) {
     setIsLoading(true);
 
     try {
-      const result = await generateNames(formData, false);
-      console.log('✅ Names generated:', result);
+      await generateNames(formData);
+      console.log('✅ Names generated successfully');
     } catch (err) {
       console.error('❌ Generation error:', err);
       setError(err.message || 'Failed to generate names. Please try again.');

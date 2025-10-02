@@ -1,90 +1,70 @@
 'use client';
 import { useState } from 'react';
-import Navbar from '@/components/Navbar';
 import NameForm from '@/components/NameForm';
 import NameCard from '@/components/NameCard';
-import Footer from '@/components/Footer';
 import { Sparkles, Loader2 } from 'lucide-react';
 
 export default function Home() {
   const [names, setNames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [lastFormData, setLastFormData] = useState(null);
 
-  const generateNames = async (formData, isMore = false) => {
+  const generateNames = async (formData) => {
+    setIsLoading(true);
+    setNames([]); // Clear previous results
+
     try {
       const response = await fetch('/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          count: isMore ? 10 : formData.count
-        })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || `Server error: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate names');
       }
 
-      if (!data.names || data.names.length === 0) {
-        throw new Error('No names generated. Please try again.');
-      }
-
-      if (isMore) {
-        setNames(prev => [...prev, ...data.names]);
-      } else {
+      const data = await response.json();
+      
+      if (data.names && Array.isArray(data.names)) {
         setNames(data.names);
+      } else {
+        throw new Error('Invalid response format');
       }
-
-      setLastFormData(formData);
-      return data.names;
-
-    } catch (err) {
-      console.error('❌ Generation error:', err);
-      throw err;
-    }
-  };
-
-  const handleGenerateMore = async () => {
-    if (!lastFormData) return;
-
-    setIsLoadingMore(true);
-    try {
-      await generateNames(lastFormData, true);
     } catch (error) {
-      alert(error.message || 'Failed to generate more names');
+      console.error('❌ Error generating names:', error);
+      throw error;
     } finally {
-      setIsLoadingMore(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
-      <Navbar />
-      
-      <main className="container mx-auto px-4 py-8 flex-grow">
-        {/* Hero Section */}
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Baby Name Generator
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+            Discover Perfect Baby Names
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Discover the perfect name for your little one with AI-powered suggestions
+            Find the perfect name for your little one with AI-powered suggestions
           </p>
         </div>
 
+        {/* Main Content */}
         <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {/* Form Section */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sticky top-8">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sticky top-6">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-indigo-600" />
                 Customize Your Search
               </h2>
               <NameForm 
-                generateNames={generateNames}
+                generateNames={generateNames} 
                 setIsLoading={setIsLoading}
                 isLoading={isLoading}
               />
@@ -94,70 +74,44 @@ export default function Home() {
           {/* Results Section */}
           <div className="lg:col-span-2">
             {isLoading ? (
-              // LOADING INDICATOR ON RIGHT SIDE
-              <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
-                <div className="relative">
-                  <div className="animate-spin rounded-full h-20 w-20 border-4 border-indigo-200 dark:border-indigo-900"></div>
-                  <div className="animate-spin rounded-full h-20 w-20 border-4 border-indigo-600 border-t-transparent absolute top-0 left-0"></div>
-                </div>
-                <p className="text-lg font-semibold text-gray-800 dark:text-white mt-6">
-                  Generating Beautiful Names...
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  This may take a few seconds
+              <div className="flex flex-col items-center justify-center min-h-[400px] bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12">
+                <Loader2 className="w-16 h-16 text-indigo-600 animate-spin mb-4" />
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+                  Generating Amazing Names...
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Our AI is crafting the perfect names for you
                 </p>
               </div>
             ) : names.length > 0 ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                    {names.length} Names Generated
+                  <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+                    Generated Names ({names.length})
                   </h2>
                 </div>
-                
-                {/* NAME CARDS */}
                 <div className="grid gap-4">
                   {names.map((name, index) => (
-                    <NameCard key={`${name.name}-${index}`} name={name} />
+                    <NameCard key={index} name={name} />
                   ))}
-                </div>
-
-                {/* Generate More Button */}
-                <div className="flex justify-center mt-8 mb-4">
-                  <button
-                    onClick={handleGenerateMore}
-                    disabled={isLoadingMore}
-                    className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-3"
-                  >
-                    {isLoadingMore ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        <span>Generating More...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-5 h-5" />
-                        <span>Generate 10 More Names</span>
-                      </>
-                    )}
-                  </button>
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="text-6xl mb-4">👶</div>
+              <div className="flex flex-col items-center justify-center min-h-[400px] bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12">
+                <div className="w-24 h-24 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 rounded-full flex items-center justify-center mb-6">
+                  <Sparkles className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+                </div>
                 <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
                   Ready to Find the Perfect Name?
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 max-w-md">
-                  Select your preferences and click "Generate Names" to discover beautiful, meaningful names for your baby.
+                <p className="text-gray-600 dark:text-gray-400 text-center max-w-md">
+                  Select your preferences and click "Generate Names" to discover beautiful, meaningful names for your baby
                 </p>
               </div>
             )}
           </div>
         </div>
-      </main>
-
+      </div>
       <Footer />
     </div>
   );
