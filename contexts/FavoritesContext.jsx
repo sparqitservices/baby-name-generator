@@ -1,39 +1,39 @@
 'use client';
-
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const FavoritesContext = createContext();
 
 export function FavoritesProvider({ children }) {
   const [favorites, setFavorites] = useState([]);
-  const [mounted, setMounted] = useState(false);
 
+  // Load favorites from localStorage on mount
   useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem('favorites');
+    const saved = localStorage.getItem('babyname-favorites');
     if (saved) {
       try {
         setFavorites(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse favorites:', e);
+      } catch (error) {
+        console.error('Failed to load favorites:', error);
       }
     }
   }, []);
 
+  // Save favorites to localStorage whenever they change
   useEffect(() => {
-    if (mounted) {
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-    }
-  }, [favorites, mounted]);
+    localStorage.setItem('babyname-favorites', JSON.stringify(favorites));
+  }, [favorites]);
 
-  const toggleFavorite = (name) => {
-    setFavorites(prev => {
-      const exists = prev.some(fav => fav.name === name.name);
-      if (exists) {
-        return prev.filter(fav => fav.name !== name.name);
+  const addFavorite = (name) => {
+    setFavorites((prev) => {
+      if (prev.some(fav => fav.name === name.name)) {
+        return prev;
       }
       return [...prev, name];
     });
+  };
+
+  const removeFavorite = (nameName) => {
+    setFavorites((prev) => prev.filter((fav) => fav.name !== nameName));
   };
 
   const clearFavorites = () => {
@@ -41,16 +41,23 @@ export function FavoritesProvider({ children }) {
   };
 
   return (
-    <FavoritesContext.Provider value={{ favorites, toggleFavorite, clearFavorites }}>
+    <FavoritesContext.Provider
+      value={{
+        favorites,
+        addFavorite,
+        removeFavorite,
+        clearFavorites
+      }}
+    >
       {children}
     </FavoritesContext.Provider>
   );
 }
 
-export const useFavorites = () => {
+export function useFavorites() {
   const context = useContext(FavoritesContext);
   if (!context) {
     throw new Error('useFavorites must be used within FavoritesProvider');
   }
   return context;
-};
+}

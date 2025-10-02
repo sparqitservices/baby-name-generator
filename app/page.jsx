@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import NameForm from '@/components/NameForm';
 import NameCard from '@/components/NameCard';
+import Footer from '@/components/Footer';
 
 export default function Home() {
   const [names, setNames] = useState([]);
@@ -13,16 +14,11 @@ export default function Home() {
     setIsLoading(false);
   };
 
-  const handleFormSubmit = () => {
-    setIsLoading(true);
-    setNames([]); // Clear previous results
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
       <Navbar />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-grow">
         {/* Hero Section */}
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
@@ -65,7 +61,7 @@ export default function Home() {
                 </div>
                 <div className="grid gap-4">
                   {names.map((name, index) => (
-                    <NameCard key={index} name={name} />
+                    <NameCard key={`${name.name}-${index}`} name={name} />
                   ))}
                 </div>
               </div>
@@ -83,6 +79,8 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

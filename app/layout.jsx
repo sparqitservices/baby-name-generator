@@ -1,6 +1,5 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
-import Navbar from '../components/Navbar';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 
@@ -75,14 +74,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="canonical" href="https://babynamegenerator.xyz" />
       </head>
       <body className={inter.className}>
         <ThemeProvider>
           <FavoritesProvider>
-            <Navbar />
             {children}
           </FavoritesProvider>
         </ThemeProvider>
