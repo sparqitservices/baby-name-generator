@@ -1,5 +1,4 @@
-const ABACUS_ENDPOINT =
-  process.env.ABACUS_API_URL ?? 'https://api.abacus.ai/api/v0/chatLLM';
+const ABACUS_ENDPOINT = 'https://api.abacus.ai/api/v0/chat';
 
 const ALLOWED_GENDERS = new Set(['boy', 'girl', 'any']);
 const ALLOWED_RELIGIONS = new Set([
@@ -60,7 +59,6 @@ export async function POST(request) {
 
     console.log('🚀 Calling Abacus API at:', ABACUS_ENDPOINT);
 
-    // Try ChatLLM format
     const response = await fetch(ABACUS_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -70,27 +68,25 @@ export async function POST(request) {
       body: JSON.stringify({
         messages: [
           {
+            role: 'system',
+            content: 'You are a helpful baby name expert. Always respond with valid JSON arrays only.'
+          },
+          {
             role: 'user',
             content: prompt
           }
         ],
-        model: 'gpt-4o',
-        temperature: 0.9,
-        max_tokens: 4000
+        deploymentId: 'gpt-4o'
       }),
       signal: AbortSignal.timeout(45_000)
     });
 
     console.log('📡 API response status:', response.status);
+    console.log('📡 API response headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorText = await safeReadText(response);
       console.error('❌ API error payload:', errorText);
-      console.error('❌ Full response:', {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries())
-      });
       return Response.json({
         names: getFallbackNames(normalizedGender, normalizedReligion, Math.min(normalizedCount, 10)),
         isApiWorking: false,
@@ -99,11 +95,13 @@ export async function POST(request) {
     }
 
     const payload = await response.json();
-    console.log('✅ API Response:', JSON.stringify(payload).substring(0, 300));
+    console.log('✅ API Response:', JSON.stringify(payload).substring(0, 500));
 
-    // Extract text from ChatLLM response
+    // Extract text from response
     let responseText = '';
-    if (payload.choices && payload.choices[0]?.message?.content) {
+    if (payload.response) {
+      responseText = payload.response;
+    } else if (payload.choices && payload.choices[0]?.message?.content) {
       responseText = payload.choices[0].message.content;
     } else if (payload.text) {
       responseText = payload.text;
@@ -111,7 +109,7 @@ export async function POST(request) {
       responseText = payload.content;
     }
 
-    console.log('📄 Extracted text:', responseText.substring(0, 200));
+    console.log('📄 Extracted text:', responseText.substring(0, 300));
 
     const parsedNames = extractNames(responseText, normalizedCount);
 
