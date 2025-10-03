@@ -90,13 +90,6 @@ export default function FavoritesPage() {
                   Export CSV
                 </button>
                 <button
-                  onClick={handleExportJSON}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors shadow-md hover:shadow-lg"
-                >
-                  <FileJson className="w-4 h-4" />
-                  Export JSON
-                </button>
-                <button
                   onClick={handlePrint}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors shadow-md hover:shadow-lg"
                 >
