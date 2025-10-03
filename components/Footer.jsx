@@ -2,10 +2,12 @@
 import { Github, Linkedin, Twitter, Mail, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const { theme } = useTheme();
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -17,15 +19,15 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative z-10 bg-gray-900 text-white py-16 px-4">
+    <footer className="relative z-10 bg-white dark:bg-gray-900 text-gray-800 dark:text-white border-t border-gray-200 dark:border-gray-800 py-16 px-4 transition-colors duration-200">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           {/* About Section */}
           <div>
-            <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
               BNG Baby Names
             </h3>
-            <p className="text-gray-400 mb-4">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               AI-powered baby name generator helping parents find the perfect name for their little ones. Discover meanings, origins, and cultural significance.
             </p>
             <div className="flex gap-4">
@@ -33,7 +35,7 @@ export default function Footer() {
                 href="https://github.com/sparqitservices" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
+                className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
                 aria-label="GitHub"
               >
                 <Github className="w-5 h-5" />
@@ -42,7 +44,7 @@ export default function Footer() {
                 href="https://www.linkedin.com/company/sparq-it-services/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
+                className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
                 aria-label="LinkedIn"
               >
                 <Linkedin className="w-5 h-5" />
@@ -51,37 +53,31 @@ export default function Footer() {
                 href="https://twitter.com/afzalhameed" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
+                className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
                 aria-label="Twitter"
               >
                 <Twitter className="w-5 h-5" />
               </a>
-              <a 
-                href="mailto:info@sparqitservices.com"
-                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
-                aria-label="Email"
-              >
-                <Mail className="w-5 h-5" />
-              </a>
+              
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-xl font-bold mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-gray-400">
+            <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Quick Links</h3>
+            <ul className="space-y-2 text-gray-600 dark:text-gray-400">
               <li>
-                <Link href="/" className="hover:text-indigo-400 transition-colors">
+                <Link href="/" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/search" className="hover:text-indigo-400 transition-colors">
+                <Link href="/search" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   Search Names
                 </Link>
               </li>
               <li>
-                <Link href="/favorites" className="hover:text-indigo-400 transition-colors">
+                <Link href="/favorites" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   Favorites
                 </Link>
               </li>
@@ -90,7 +86,7 @@ export default function Footer() {
                   href="https://www.sparqitservices.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:text-indigo-400 transition-colors flex items-center gap-2"
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-2"
                 >
                   Company Website <ExternalLink className="w-4 h-4" />
                 </a>
@@ -100,7 +96,7 @@ export default function Footer() {
                   href="https://github.com/sparqitservices/baby-name-generator" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:text-indigo-400 transition-colors flex items-center gap-2"
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-2"
                 >
                   GitHub Repository <ExternalLink className="w-4 h-4" />
                 </a>
@@ -110,8 +106,8 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="text-xl font-bold mb-4">Stay Updated</h3>
-            <p className="text-gray-400 mb-4">Subscribe to get updates on new features!</p>
+            <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Stay Updated</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">Subscribe to get updates on new features!</p>
             <form onSubmit={handleSubscribe} className="space-y-3">
               <input
                 type="email"
@@ -119,7 +115,7 @@ export default function Footer() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
-                className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
               />
               <button
                 type="submit"
@@ -128,25 +124,25 @@ export default function Footer() {
                 Subscribe
               </button>
               {subscribed && (
-                <p className="text-green-400 text-sm animate-fade-in">✓ Successfully subscribed!</p>
+                <p className="text-green-500 dark:text-green-400 text-sm animate-fade-in">✓ Successfully subscribed!</p>
               )}
             </form>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800 pt-8">
+        <div className="border-t border-gray-200 dark:border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-center md:text-left">
+            <p className="text-gray-600 dark:text-gray-400 text-center md:text-left">
               No copyrights, just good vibes and zero drama. 🎉
             </p>
-            <p className="text-gray-400 text-center md:text-right">
+            <p className="text-gray-600 dark:text-gray-400 text-center md:text-right">
               Built with ❤️ by{' '}
               <a 
-                href="https://www.sparqitservices.com" 
+                href="https://x.com/iafzalhameed" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
+                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold transition-colors"
               >
                 Afzal Hameed
               </a>
@@ -155,7 +151,7 @@ export default function Footer() {
                 href="https://www.sparqitservices.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-purple-400 hover:text-purple-300 font-semibold transition-colors"
+                className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-colors"
               >
                 Sparq IT Services
               </a>
