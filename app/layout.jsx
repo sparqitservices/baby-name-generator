@@ -14,13 +14,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
+      <body className={`${inter.className} overflow-x-hidden`}>
         <ThemeProvider>
           <FavoritesProvider>
-            <div className="flex flex-col min-h-screen">
+            <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
               <Navbar />
-              <main className="flex-grow">
+              <main className="flex-grow w-full overflow-x-hidden">
                 {children}
               </main>
               <Footer />
