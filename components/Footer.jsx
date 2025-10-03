@@ -146,15 +146,7 @@ export default function Footer() {
               >
                 Afzal Hameed
               </a>
-              {' '}at{' '}
-              <a 
-                href="https://www.sparqitservices.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-colors"
-              >
-                Sparq IT Services
-              </a>
+              
             </p>
           </div>
         </div>
