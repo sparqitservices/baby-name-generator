@@ -1,6 +1,7 @@
 'use client';
 import { Github, Linkedin, Twitter, Mail, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -25,14 +26,15 @@ export default function Footer() {
               BNG Baby Names
             </h3>
             <p className="text-gray-400 mb-4">
-              AI-powered baby name generator helping parents find the perfect name for their little ones.
+              AI-powered baby name generator helping parents find the perfect name for their little ones. Discover meanings, origins, and cultural significance.
             </p>
             <div className="flex gap-4">
               <a 
                 href="https://github.com/sparqitservices" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-colors"
+                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
+                aria-label="GitHub"
               >
                 <Github className="w-5 h-5" />
               </a>
@@ -40,7 +42,8 @@ export default function Footer() {
                 href="https://www.linkedin.com/company/sparq-it-services/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-colors"
+                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
+                aria-label="LinkedIn"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
@@ -48,13 +51,15 @@ export default function Footer() {
                 href="https://twitter.com/afzalhameed" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-colors"
+                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
+                aria-label="Twitter"
               >
                 <Twitter className="w-5 h-5" />
               </a>
               <a 
                 href="mailto:info@sparqitservices.com"
-                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-colors"
+                className="p-2 bg-gray-800 rounded-lg hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
+                aria-label="Email"
               >
                 <Mail className="w-5 h-5" />
               </a>
@@ -66,10 +71,19 @@ export default function Footer() {
             <h3 className="text-xl font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-gray-400">
               <li>
-                <a href="/" className="hover:text-indigo-400 transition-colors">Home</a>
+                <Link href="/" className="hover:text-indigo-400 transition-colors">
+                  Home
+                </Link>
               </li>
               <li>
-                <a href="/favorites" className="hover:text-indigo-400 transition-colors">Favorites</a>
+                <Link href="/search" className="hover:text-indigo-400 transition-colors">
+                  Search Names
+                </Link>
+              </li>
+              <li>
+                <Link href="/favorites" className="hover:text-indigo-400 transition-colors">
+                  Favorites
+                </Link>
               </li>
               <li>
                 <a 
@@ -109,12 +123,12 @@ export default function Footer() {
               />
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
                 Subscribe
               </button>
               {subscribed && (
-                <p className="text-green-400 text-sm">✓ Successfully subscribed!</p>
+                <p className="text-green-400 text-sm animate-fade-in">✓ Successfully subscribed!</p>
               )}
             </form>
           </div>
@@ -124,7 +138,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-center md:text-left">
-              No copyrights, just good vibes and zero drama.
+              No copyrights, just good vibes and zero drama. 🎉
             </p>
             <p className="text-gray-400 text-center md:text-right">
               Built with ❤️ by{' '}

@@ -6,6 +6,7 @@ export default function SearchPage() {
   const [searchResult, setSearchResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [shareMessage, setShareMessage] = useState('');
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -44,6 +45,41 @@ export default function SearchPage() {
     }
   };
 
+  const handleShare = async () => {
+    if (!searchResult) return;
+
+    const shareText = `✨ ${searchResult.name} ✨\n\n📖 Meaning: ${searchResult.meaning}\n🌍 Origin: ${searchResult.origin}\n👤 Gender: ${searchResult.gender}\n\n🔗 Discover more baby names at: ${window.location.origin}`;
+
+    // Try native share first
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${searchResult.name} - Baby Name Meaning`,
+          text: shareText,
+        });
+        setShareMessage('Shared successfully! ✅');
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error('Share error:', err);
+          copyToClipboard(shareText);
+        }
+      }
+    } else {
+      // Fallback to clipboard
+      copyToClipboard(shareText);
+    }
+
+    setTimeout(() => setShareMessage(''), 3000);
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setShareMessage('Copied to clipboard! 📋');
+    }).catch(() => {
+      setShareMessage('Failed to copy');
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 py-12 px-4">
       <div className="container mx-auto max-w-4xl">
@@ -71,7 +107,7 @@ export default function SearchPage() {
             <button
               type="submit"
               disabled={isLoading || !searchQuery.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-6 rounded-xl disabled:opacity-50"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-6 rounded-xl disabled:opacity-50 transition-all duration-200 hover:shadow-lg"
             >
               {isLoading ? 'Searching...' : 'Search'}
             </button>
@@ -101,14 +137,30 @@ export default function SearchPage() {
         {searchResult && !isLoading && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
             <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-8 text-white">
-              <h2 className="text-4xl md:text-5xl font-bold mb-2">
-                {searchResult.name}
-              </h2>
+              <div className="flex items-start justify-between mb-2">
+                <h2 className="text-4xl md:text-5xl font-bold">
+                  {searchResult.name}
+                </h2>
+                <button
+                  onClick={handleShare}
+                  className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 transform hover:scale-110"
+                  title="Share this name"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                </button>
+              </div>
               <div className="flex items-center gap-4 text-indigo-100">
                 <span>{searchResult.origin}</span>
                 <span>•</span>
                 <span className="capitalize">{searchResult.gender}</span>
               </div>
+              {shareMessage && (
+                <div className="mt-4 bg-white/20 rounded-lg px-4 py-2 text-sm animate-fade-in">
+                  {shareMessage}
+                </div>
+              )}
             </div>
 
             <div className="p-8 space-y-6">

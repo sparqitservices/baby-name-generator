@@ -1,14 +1,15 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { FavoritesProvider } from '@/contexts/FavoritesContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'BabyNames - AI-Powered Baby Name Generator',
-  description: 'Discover the perfect name for your little one with AI-powered suggestions',
+  title: 'BNG - AI Baby Name Generator',
+  description: 'Discover the perfect baby name with AI-powered suggestions',
 };
 
 export default function RootLayout({ children }) {
@@ -17,10 +18,13 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <ThemeProvider>
           <FavoritesProvider>
-            <Navbar />
-            <main className="min-h-screen">
-              {children}
-            </main>
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </div>
           </FavoritesProvider>
         </ThemeProvider>
       </body>
