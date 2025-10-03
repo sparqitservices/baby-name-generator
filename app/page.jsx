@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import NameForm from '@/components/NameForm';
 import NameCard from '@/components/NameCard';
 import { Sparkles, Loader2, Plus } from 'lucide-react';
@@ -8,12 +8,33 @@ export default function Home() {
   const [names, setNames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [lastFormData, setLastFormData] = useState(null);
+  const lastCardRef = useRef(null);
+  const shouldScrollRef = useRef(false);
+
+  // Scroll to last card after new names are added
+  useEffect(() => {
+    if (shouldScrollRef.current && lastCardRef.current) {
+      setTimeout(() => {
+        lastCardRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
+        shouldScrollRef.current = false;
+      }, 100);
+    }
+  }, [names]);
 
   const generateNames = async (formData, append = false) => {
     setIsLoading(true);
+    
     if (!append) {
       setNames([]); // Clear previous results only if not appending
+      shouldScrollRef.current = false;
+    } else {
+      shouldScrollRef.current = true; // Enable scroll for "Generate More"
     }
+    
     setLastFormData(formData); // Save form data for "Generate More"
 
     try {
@@ -87,7 +108,7 @@ export default function Home() {
 
           {/* Results Section */}
           <div className="lg:col-span-2">
-            {isLoading ? (
+            {isLoading && names.length === 0 ? (
               <div className="flex flex-col items-center justify-center min-h-[400px] bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12">
                 <Loader2 className="w-16 h-16 text-indigo-600 animate-spin mb-4" />
                 <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
@@ -106,20 +127,34 @@ export default function Home() {
                 </div>
                 <div className="grid gap-4">
                   {names.map((name, index) => (
-                    <NameCard key={index} name={name} />
+                    <div 
+                      key={`${name.name}-${index}`}
+                      ref={index === names.length - 1 ? lastCardRef : null}
+                    >
+                      <NameCard name={name} />
+                    </div>
                   ))}
                 </div>
                 
                 {/* Generate More Button */}
-                <div className="flex justify-center mt-8">
-                  <button
-                    onClick={handleGenerateMore}
-                    disabled={isLoading}
-                    className="bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl border-2 border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2"
-                  >
-                    <Plus className="w-5 h-5" />
-                    <span>Generate More</span>
-                  </button>
+                <div className="flex justify-center mt-8 mb-8">
+                  {isLoading ? (
+                    <div className="flex flex-col items-center">
+                      <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-3" />
+                      <p className="text-gray-600 dark:text-gray-400 font-medium">
+                        Loading more names...
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleGenerateMore}
+                      disabled={isLoading}
+                      className="bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl border-2 border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2"
+                    >
+                      <Plus className="w-5 h-5" />
+                      <span>Generate More</span>
+                    </button>
+                  )}
                 </div>
               </div>
             ) : (

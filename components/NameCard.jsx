@@ -50,11 +50,6 @@ export default function NameCard({ name }) {
     }
   };
 
-  // Shorten meaning to max 100 characters
-  const shortMeaning = name.meaning && name.meaning.length > 100 
-    ? name.meaning.substring(0, 100) + '...' 
-    : name.meaning || 'A beautiful and meaningful name';
-
   const genderColors = {
     boy: 'from-blue-500 to-cyan-500',
     girl: 'from-pink-500 to-rose-500',
@@ -125,8 +120,8 @@ export default function NameCard({ name }) {
           </button>
         </div>
       </div>
-      <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
-        {shortMeaning}
+      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+        {name.meaning || 'A beautiful and meaningful name'}
       </p>
     </div>
   );
