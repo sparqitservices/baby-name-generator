@@ -1,15 +1,44 @@
 'use client';
 import { useState } from 'react';
-import { Copy, Check, Heart } from 'lucide-react';
+import { Copy, Check, Heart, Share2 } from 'lucide-react';
 
 export default function NameCard({ name }) {
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(name.name);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleShare = async () => {
+    const shareText = `Check out this beautiful baby name!\n\n✨ ${name.name} ✨\n\nOrigin: ${name.origin || 'Traditional'}\nMeaning: ${name.meaning || 'A beautiful and meaningful name'}\n\nDiscover more names at: ${window.location.origin}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Baby Name: ${name.name}`,
+          text: shareText,
+          url: window.location.origin
+        });
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          // Fallback to clipboard
+          navigator.clipboard.writeText(shareText);
+          setShared(true);
+          setTimeout(() => setShared(false), 2000);
+        }
+      }
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      navigator.clipboard.writeText(shareText);
+      setShared(true);
+      setTimeout(() => setShared(false), 2000);
+    }
   };
 
   const handleFavorite = () => {
@@ -45,6 +74,17 @@ export default function NameCard({ name }) {
           </p>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={handleShare}
+            className={`p-2 rounded-lg transition-all ${
+              shared
+                ? 'bg-green-100 dark:bg-green-900/30'
+                : 'bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/30'
+            }`}
+            title="Share this name"
+          >
+            <Share2 className={`w-5 h-5 ${shared ? 'text-green-600' : 'text-gray-600 dark:text-gray-400'}`} />
+          </button>
           <button
             onClick={handleCopy}
             className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"

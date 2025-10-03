@@ -2,15 +2,19 @@
 import { useState } from 'react';
 import NameForm from '@/components/NameForm';
 import NameCard from '@/components/NameCard';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, Plus } from 'lucide-react';
 
 export default function Home() {
   const [names, setNames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [lastFormData, setLastFormData] = useState(null);
 
-  const generateNames = async (formData) => {
+  const generateNames = async (formData, append = false) => {
     setIsLoading(true);
-    setNames([]); // Clear previous results
+    if (!append) {
+      setNames([]); // Clear previous results only if not appending
+    }
+    setLastFormData(formData); // Save form data for "Generate More"
 
     try {
       const response = await fetch('/api/generate', {
@@ -29,7 +33,11 @@ export default function Home() {
       const data = await response.json();
       
       if (data.names && Array.isArray(data.names)) {
-        setNames(data.names);
+        if (append) {
+          setNames(prev => [...prev, ...data.names]);
+        } else {
+          setNames(data.names);
+        }
       } else {
         throw new Error('Invalid response format');
       }
@@ -38,6 +46,12 @@ export default function Home() {
       throw error;
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGenerateMore = () => {
+    if (lastFormData) {
+      generateNames(lastFormData, true);
     }
   };
 
@@ -94,6 +108,18 @@ export default function Home() {
                   {names.map((name, index) => (
                     <NameCard key={index} name={name} />
                   ))}
+                </div>
+                
+                {/* Generate More Button */}
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={handleGenerateMore}
+                    disabled={isLoading}
+                    className="bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl border-2 border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2"
+                  >
+                    <Plus className="w-5 h-5" />
+                    <span>Generate More</span>
+                  </button>
                 </div>
               </div>
             ) : (
