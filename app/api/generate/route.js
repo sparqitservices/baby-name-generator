@@ -73,7 +73,7 @@ export async function POST(request) {
         messages: [
           {
             role: 'system',
-            content: 'You are a baby name expert. Always respond with valid JSON arrays only. Provide concise descriptions of exactly 100-120 characters for each name. No markdown, no explanations.'
+            content: 'You are a baby name expert. Always respond with valid JSON arrays only. Provide concise descriptions of exactly 120-150 characters for each name. No markdown, no explanations.'
           },
           {
             role: 'user',
@@ -187,7 +187,7 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no code b
 [
   {
     "name": "string",
-    "meaning": "concise description of exactly 100-120 characters - clear, meaningful, and beautiful",
+    "meaning": "concise description of exactly 120-150 characters - clear, meaningful, and beautiful",
     "origin": "cultural/linguistic origin",
     "gender": "boy|girl|any"
   }
@@ -195,7 +195,7 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no code b
 
 CRITICAL REQUIREMENTS:
 - Each name must be authentic to the ${religion} tradition
-- Meanings MUST be exactly 100-120 characters (not words) - concise and elegant
+- Meanings MUST be exactly 120-150 characters (not words) - concise and elegant
 - Include the name's significance in a brief, beautiful way
 - Gender must be "${gender === 'any' ? 'any' : gender}"
 - Return exactly ${count} names
@@ -249,13 +249,13 @@ function extractNames(text, desiredCount) {
       .map(item => {
         let meaning = item.meaning.trim();
         
-        // Ensure meaning is between 100-120 characters
-        if (meaning.length < 100) {
+        // Ensure meaning is between 120-150 characters
+        if (meaning.length < 120) {
           // Pad if too short (shouldn't happen with good prompts)
           meaning = meaning;
-        } else if (meaning.length > 120) {
+        } else if (meaning.length > 150) {
           // Truncate if too long
-          meaning = meaning.substring(0, 117) + '...';
+          meaning = meaning.substring(0, 147) + '...';
         }
         
         return {
