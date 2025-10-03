@@ -12,7 +12,12 @@ export default function SearchPage() {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
+    
+    const trimmedQuery = searchQuery.trim();
+    if (!trimmedQuery) {
+      setError('Please enter a name to search');
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -24,18 +29,18 @@ export default function SearchPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: searchQuery.trim() }),
+        body: JSON.stringify({ name: trimmedQuery }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to search name');
+        throw new Error(data.error || 'Failed to search name');
       }
 
-      const data = await response.json();
       setSearchResult(data);
     } catch (err) {
-      console.error('❌ Search error:', err);
+      console.error('Search error:', err);
       setError(err.message || 'Failed to search. Please try again.');
     } finally {
       setIsLoading(false);
@@ -59,11 +64,13 @@ export default function SearchPage() {
     }
   };
 
+  const isFav = searchResult ? isFavorite(searchResult.name) : false;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
+        <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Search className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
             <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -77,7 +84,7 @@ export default function SearchPage() {
 
         {/* Search Form */}
         <div className="max-w-3xl mx-auto mb-12">
-          <form onSubmit={handleSearch} className="relative">
+          <form onSubmit={handleSearch}>
             <div className="relative">
               <input
                 type="text"
@@ -126,7 +133,7 @@ export default function SearchPage() {
         )}
 
         {/* Error State */}
-        {error && (
+        {error && !isLoading && (
           <div className="max-w-3xl mx-auto">
             <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-6">
               <p className="text-red-600 dark:text-red-400 text-center font-medium">
@@ -138,7 +145,7 @@ export default function SearchPage() {
 
         {/* Search Result */}
         {searchResult && !isLoading && (
-          <div className="max-w-3xl mx-auto animate-fade-in">
+          <div className="max-w-3xl mx-auto">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
               {/* Header */}
               <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-8 text-white">
@@ -162,7 +169,7 @@ export default function SearchPage() {
                   >
                     <HeartIcon
                       className={`w-6 h-6 ${
-                        isFavorite(searchResult.name)
+                        isFav
                           ? 'fill-red-500 text-red-500'
                           : 'text-white'
                       }`}
