@@ -29,13 +29,13 @@ export async function OPTIONS(request) {
 
 export async function POST(request) {
   try {
-    const { gender = 'any', religion = 'muslim', style = 'modern', count = 20 } = await request.json();
+    const { gender = 'any', religion = 'muslim', style = 'modern', count = 10 } = await request.json();
 
     // Validate and normalize inputs
     const normalizedGender = normalizeValue(gender, ALLOWED_GENDERS, 'any');
     const normalizedReligion = normalizeValue(religion, ALLOWED_RELIGIONS, 'muslim');
     const normalizedStyle = String(style || 'modern').trim().toLowerCase();
-    const normalizedCount = clamp(Number(count) || 20, 5, 50);
+    const normalizedCount = clamp(Number(count) || 10, 5, 50);
 
     console.log('📝 Request:', { gender: normalizedGender, religion: normalizedReligion, style: normalizedStyle, count: normalizedCount });
 
@@ -73,7 +73,7 @@ export async function POST(request) {
         messages: [
           {
             role: 'system',
-            content: 'You are a baby name expert. Always respond with valid JSON arrays only. Provide detailed, meaningful descriptions of 100-120 words for each name. No markdown, no explanations.'
+            content: 'You are a baby name expert. Always respond with valid JSON arrays only. Provide concise descriptions of exactly 100-120 characters for each name. No markdown, no explanations.'
           },
           {
             role: 'user',
@@ -81,7 +81,7 @@ export async function POST(request) {
           }
         ],
         temperature: 0.9,
-        max_tokens: 8000,
+        max_tokens: 4000,
         top_p: 1,
         stream: false
       }),
@@ -187,7 +187,7 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no code b
 [
   {
     "name": "string",
-    "meaning": "detailed description of 100-120 words explaining the name's meaning, cultural significance, historical context, and beautiful qualities",
+    "meaning": "concise description of exactly 100-120 characters - clear, meaningful, and beautiful",
     "origin": "cultural/linguistic origin",
     "gender": "boy|girl|any"
   }
@@ -195,12 +195,12 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no code b
 
 CRITICAL REQUIREMENTS:
 - Each name must be authentic to the ${religion} tradition
-- Meanings MUST be detailed and comprehensive (100-120 words)
-- Include cultural significance, etymology, and beautiful qualities
+- Meanings MUST be exactly 100-120 characters (not words) - concise and elegant
+- Include the name's significance in a brief, beautiful way
 - Gender must be "${gender === 'any' ? 'any' : gender}"
 - Return exactly ${count} names
 - Output must be valid JSON only
-- Make descriptions engaging, informative, and meaningful
+- Keep descriptions short but meaningful
 
 Generate now:`;
 }
@@ -246,12 +246,25 @@ function extractNames(text, desiredCount) {
           ['boy', 'girl', 'any'].includes(item.gender.toLowerCase())
         );
       })
-      .map(item => ({
-        name: item.name.trim(),
-        meaning: item.meaning.trim(),
-        origin: item.origin.trim(),
-        gender: item.gender.trim().toLowerCase()
-      }))
+      .map(item => {
+        let meaning = item.meaning.trim();
+        
+        // Ensure meaning is between 100-120 characters
+        if (meaning.length < 100) {
+          // Pad if too short (shouldn't happen with good prompts)
+          meaning = meaning;
+        } else if (meaning.length > 120) {
+          // Truncate if too long
+          meaning = meaning.substring(0, 117) + '...';
+        }
+        
+        return {
+          name: item.name.trim(),
+          meaning: meaning,
+          origin: item.origin.trim(),
+          gender: item.gender.trim().toLowerCase()
+        };
+      })
       .slice(0, desiredCount);
 
     console.log(`✅ Parsed ${validNames.length} valid names`);

@@ -8,14 +8,14 @@ export default function Home() {
   const [names, setNames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [lastFormData, setLastFormData] = useState(null);
-  const lastCardRef = useRef(null);
+  const firstNewCardRef = useRef(null);
   const shouldScrollRef = useRef(false);
 
-  // Scroll to last card after new names are added
+  // Scroll to first new card after new names are added
   useEffect(() => {
-    if (shouldScrollRef.current && lastCardRef.current) {
+    if (shouldScrollRef.current && firstNewCardRef.current) {
       setTimeout(() => {
-        lastCardRef.current.scrollIntoView({ 
+        firstNewCardRef.current.scrollIntoView({ 
           behavior: 'smooth', 
           block: 'start',
           inline: 'nearest'
@@ -35,7 +35,9 @@ export default function Home() {
       shouldScrollRef.current = true; // Enable scroll for "Generate More"
     }
     
-    setLastFormData(formData); // Save form data for "Generate More"
+    // Always generate 10 names for "Generate More"
+    const requestData = append ? { ...formData, count: 10 } : formData;
+    setLastFormData(formData); // Save original form data
 
     try {
       const response = await fetch('/api/generate', {
@@ -43,7 +45,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestData),
       });
 
       if (!response.ok) {
@@ -126,14 +128,19 @@ export default function Home() {
                   </h2>
                 </div>
                 <div className="grid gap-4">
-                  {names.map((name, index) => (
-                    <div 
-                      key={`${name.name}-${index}`}
-                      ref={index === names.length - 1 ? lastCardRef : null}
-                    >
-                      <NameCard name={name} />
-                    </div>
-                  ))}
+                  {names.map((name, index) => {
+                    // Calculate if this is the first card of a new batch
+                    const isFirstNewCard = shouldScrollRef.current && index === names.length - 10;
+                    
+                    return (
+                      <div 
+                        key={`${name.name}-${index}`}
+                        ref={isFirstNewCard ? firstNewCardRef : null}
+                      >
+                        <NameCard name={name} />
+                      </div>
+                    );
+                  })}
                 </div>
                 
                 {/* Generate More Button */}
@@ -142,7 +149,7 @@ export default function Home() {
                     <div className="flex flex-col items-center">
                       <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-3" />
                       <p className="text-gray-600 dark:text-gray-400 font-medium">
-                        Loading more names...
+                        Loading 10 more names...
                       </p>
                     </div>
                   ) : (
@@ -152,7 +159,7 @@ export default function Home() {
                       className="bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl border-2 border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2"
                     >
                       <Plus className="w-5 h-5" />
-                      <span>Generate More</span>
+                      <span>Generate More (10 names)</span>
                     </button>
                   )}
                 </div>
