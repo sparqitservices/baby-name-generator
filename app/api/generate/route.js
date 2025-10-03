@@ -73,7 +73,7 @@ export async function POST(request) {
         messages: [
           {
             role: 'system',
-            content: 'You are a baby name expert. Always respond with valid JSON arrays only. No markdown, no explanations.'
+            content: 'You are a baby name expert. Always respond with valid JSON arrays only. Keep meanings SHORT (maximum 12 words). No markdown, no explanations.'
           },
           {
             role: 'user',
@@ -187,18 +187,19 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no code b
 [
   {
     "name": "string",
-    "meaning": "detailed meaning and significance",
+    "meaning": "SHORT meaning in 8-12 words maximum - clear and simple",
     "origin": "cultural/linguistic origin",
     "gender": "boy|girl|any"
   }
 ]
 
-Requirements:
+CRITICAL REQUIREMENTS:
 - Each name must be authentic to the ${religion} tradition
-- Meanings must be detailed and accurate
+- Meanings MUST be SHORT (maximum 12 words) - concise and beautiful
 - Gender must be "${gender === 'any' ? 'any' : gender}"
 - Return exactly ${count} names
 - Output must be valid JSON only
+- NO long descriptions - keep meanings brief and elegant
 
 Generate now:`;
 }
@@ -244,12 +245,20 @@ function extractNames(text, desiredCount) {
           ['boy', 'girl', 'any'].includes(item.gender.toLowerCase())
         );
       })
-      .map(item => ({
-        name: item.name.trim(),
-        meaning: item.meaning.trim(),
-        origin: item.origin.trim(),
-        gender: item.gender.trim().toLowerCase()
-      }))
+      .map(item => {
+        // Shorten meaning if too long (max 100 characters)
+        let meaning = item.meaning.trim();
+        if (meaning.length > 100) {
+          meaning = meaning.substring(0, 97) + '...';
+        }
+        
+        return {
+          name: item.name.trim(),
+          meaning: meaning,
+          origin: item.origin.trim(),
+          gender: item.gender.trim().toLowerCase()
+        };
+      })
       .slice(0, desiredCount);
 
     console.log(`✅ Parsed ${validNames.length} valid names`);

@@ -1,11 +1,14 @@
 'use client';
 import { useState } from 'react';
 import { Copy, Check, Heart, Share2 } from 'lucide-react';
+import { useFavorites } from '@/contexts/FavoritesContext';
 
 export default function NameCard({ name }) {
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { favorites, addFavorite, removeFavorite } = useFavorites();
+  
+  const isFavorite = favorites.some(fav => fav.name === name.name);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(name.name);
@@ -27,14 +30,12 @@ export default function NameCard({ name }) {
         setTimeout(() => setShared(false), 2000);
       } catch (err) {
         if (err.name !== 'AbortError') {
-          // Fallback to clipboard
           navigator.clipboard.writeText(shareText);
           setShared(true);
           setTimeout(() => setShared(false), 2000);
         }
       }
     } else {
-      // Fallback for browsers that don't support Web Share API
       navigator.clipboard.writeText(shareText);
       setShared(true);
       setTimeout(() => setShared(false), 2000);
@@ -42,8 +43,17 @@ export default function NameCard({ name }) {
   };
 
   const handleFavorite = () => {
-    setIsFavorite(!isFavorite);
+    if (isFavorite) {
+      removeFavorite(name.name);
+    } else {
+      addFavorite(name);
+    }
   };
+
+  // Shorten meaning to max 100 characters
+  const shortMeaning = name.meaning && name.meaning.length > 100 
+    ? name.meaning.substring(0, 100) + '...' 
+    : name.meaning || 'A beautiful and meaningful name';
 
   const genderColors = {
     boy: 'from-blue-500 to-cyan-500',
@@ -61,7 +71,7 @@ export default function NameCard({ name }) {
     <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border-2 border-transparent hover:border-indigo-200 dark:hover:border-indigo-800">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
             <h3 className={`text-3xl font-bold bg-gradient-to-r ${genderColors[name.gender || 'any']} bg-clip-text text-transparent`}>
               {name.name}
             </h3>
@@ -115,8 +125,8 @@ export default function NameCard({ name }) {
           </button>
         </div>
       </div>
-      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-        {name.meaning || 'A beautiful and meaningful name'}
+      <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
+        {shortMeaning}
       </p>
     </div>
   );
