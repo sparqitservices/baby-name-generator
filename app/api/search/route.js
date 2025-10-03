@@ -45,31 +45,33 @@ export async function POST(request) {
       );
     }
 
-    // Build prompt
-    const prompt = `Provide detailed information about the name "${searchName}" in JSON format.
+    // Build prompt - more explicit about JSON format
+    const prompt = `Analyze the name "${searchName}" and provide detailed information.
 
-Return ONLY a valid JSON object with this exact structure (no markdown, no code blocks):
+You must respond with ONLY a valid JSON object. Do not include any markdown, code blocks, or explanations.
+
+Required JSON structure:
 {
   "name": "${searchName}",
-  "meaning": "concise meaning in 120-150 characters",
-  "origin": "cultural/linguistic origin",
-  "gender": "boy|girl|any",
-  "detailedDescription": "detailed 2-3 sentence description about the name's meaning and significance",
-  "culturalSignificance": "2-3 sentences about cultural, religious, or historical significance",
-  "popularity": "information about the name's popularity and usage",
-  "famousPersonalities": ["list of 3-5 famous people with this name"]
+  "meaning": "brief meaning in 120-150 characters",
+  "origin": "cultural or linguistic origin",
+  "gender": "boy or girl or any",
+  "detailedDescription": "2-3 sentences about the name's meaning and significance",
+  "culturalSignificance": "2-3 sentences about cultural, religious, or historical importance",
+  "popularity": "information about the name's popularity and usage trends",
+  "famousPersonalities": ["person 1", "person 2", "person 3"]
 }
 
-CRITICAL REQUIREMENTS:
-- Provide accurate, well-researched information
-- Be culturally sensitive and respectful
-- Include authentic details about the name's heritage
-- If the name exists in multiple cultures, mention all
+Important:
+- Respond with ONLY the JSON object
+- No markdown formatting
+- No code blocks
+- No additional text
+- Ensure all fields are filled with accurate information
 - Keep meaning between 120-150 characters
-- Make descriptions informative and engaging
-- Output must be valid JSON only
+- Provide 3-5 famous personalities if available
 
-Generate now:`;
+Respond now with the JSON object only:`;
 
     console.log('🚀 Calling Groq API...');
 
@@ -85,7 +87,7 @@ Generate now:`;
         messages: [
           {
             role: 'system',
-            content: 'You are a baby name expert with deep knowledge of names from all cultures and religions. Always respond with valid JSON only. Provide accurate, detailed, and culturally sensitive information.'
+            content: 'You are a baby name expert. You MUST respond with ONLY valid JSON objects. Never use markdown, code blocks, or any formatting. Only output raw JSON.'
           },
           {
             role: 'user',
@@ -95,7 +97,8 @@ Generate now:`;
         temperature: 0.7,
         max_tokens: 2000,
         top_p: 1,
-        stream: false
+        stream: false,
+        response_format: { type: "json_object" }
       }),
       signal: AbortSignal.timeout(30000)
     });
@@ -106,9 +109,9 @@ Generate now:`;
       const errorText = await response.text();
       console.error('❌ API Error:', errorText);
       return new Response(
-        JSON.stringify({ error: `API request failed: ${response.status} ${response.statusText}` }),
+        JSON.stringify({ error: `Failed to search name. Please try again.` }),
         { 
-          status: response.status,
+          status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
@@ -122,7 +125,7 @@ Generate now:`;
     if (!content) {
       console.error('❌ No content in response');
       return new Response(
-        JSON.stringify({ error: 'No content received from API' }),
+        JSON.stringify({ error: 'No information received. Please try again.' }),
         { 
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -130,7 +133,7 @@ Generate now:`;
       );
     }
 
-    console.log('📄 Content preview:', content.substring(0, 200));
+    console.log('📄 Raw content:', content);
 
     // Parse result
     const result = parseSearchResult(content, searchName);
@@ -138,7 +141,7 @@ Generate now:`;
     if (!result) {
       console.error('❌ Failed to parse search result');
       return new Response(
-        JSON.stringify({ error: 'Failed to parse name information. Please try again.' }),
+        JSON.stringify({ error: 'Failed to process name information. Please try again.' }),
         { 
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -146,7 +149,7 @@ Generate now:`;
       );
     }
 
-    console.log('🎉 Returning search result');
+    console.log('🎉 Returning search result:', result);
     return new Response(
       JSON.stringify(result),
       { 
@@ -170,7 +173,7 @@ Generate now:`;
     }
 
     return new Response(
-      JSON.stringify({ error: 'Internal server error. Please try again later.' }),
+      JSON.stringify({ error: 'An error occurred. Please try again.' }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -185,44 +188,50 @@ function parseSearchResult(text, searchName) {
     return null;
   }
 
-  // Remove markdown code blocks if present
-  let cleanText = text.trim();
-  cleanText = cleanText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-
-  // Find JSON object
-  const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    console.error('No JSON object found in response');
-    return null;
-  }
-
   try {
+    // Remove any markdown code blocks
+    let cleanText = text.trim();
+    cleanText = cleanText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+    
+    // Remove any leading/trailing whitespace
+    cleanText = cleanText.trim();
+    
+    // Try to find JSON object
+    let jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      // If no match, try parsing the whole text
+      jsonMatch = [cleanText];
+    }
+
     const parsed = JSON.parse(jsonMatch[0]);
     
     // Validate required fields
-    if (!parsed.name || !parsed.meaning || !parsed.origin || !parsed.gender) {
-      console.error('Missing required fields in parsed result');
+    if (!parsed.name && !parsed.meaning && !parsed.origin) {
+      console.error('Missing critical fields in parsed result');
       return null;
     }
 
-    // Clean and validate
+    // Clean and validate with defaults
     return {
-      name: parsed.name.trim() || searchName,
-      meaning: parsed.meaning.trim(),
-      origin: parsed.origin.trim(),
-      gender: ['boy', 'girl', 'any'].includes(parsed.gender.toLowerCase()) 
-        ? parsed.gender.toLowerCase() 
+      name: (parsed.name || searchName).trim(),
+      meaning: (parsed.meaning || 'A beautiful and meaningful name').trim(),
+      origin: (parsed.origin || 'Various cultures').trim(),
+      gender: ['boy', 'girl', 'any'].includes(String(parsed.gender || '').toLowerCase()) 
+        ? String(parsed.gender).toLowerCase() 
         : 'any',
-      detailedDescription: parsed.detailedDescription?.trim() || '',
-      culturalSignificance: parsed.culturalSignificance?.trim() || '',
-      popularity: parsed.popularity?.trim() || '',
+      detailedDescription: (parsed.detailedDescription || parsed.description || '').trim(),
+      culturalSignificance: (parsed.culturalSignificance || parsed.cultural || '').trim(),
+      popularity: (parsed.popularity || '').trim(),
       famousPersonalities: Array.isArray(parsed.famousPersonalities) 
         ? parsed.famousPersonalities.filter(p => typeof p === 'string' && p.trim().length > 0)
-        : []
+        : (Array.isArray(parsed.famous) 
+          ? parsed.famous.filter(p => typeof p === 'string' && p.trim().length > 0)
+          : [])
     };
 
   } catch (error) {
     console.error('❌ JSON parse error:', error.message);
+    console.error('Text that failed to parse:', text);
     return null;
   }
 }
