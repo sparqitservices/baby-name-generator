@@ -182,14 +182,29 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center text-gray-600 dark:text-gray-400">
-            <p className="mb-2">© 2025 BabyNames. Powered by AI.</p>
-            <p className="text-sm">Made with ❤️ for parents-to-be</p>
-          </div>
-        </div>
-      </footer>
+<footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
+  <div className="container mx-auto px-4 py-8">
+    <div className="text-center text-gray-600 dark:text-gray-400">
+      <p className="mb-2">© 2025 Baby Name Generator. Powered by AI.</p>
+      <p className="text-sm mb-4">Made with ❤️ for parents-to-be by Afzal</p>
+      <div className="flex justify-center gap-6 text-sm">
+        <a 
+          href="/privacy" 
+          className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+        >
+          Privacy Policy
+        </a>
+        <span>•</span>
+        <a 
+          href="/terms" 
+          className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+        >
+          Terms & Conditions
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
     </div>
   );
 }
