@@ -1,8 +1,6 @@
 'use client';
 import { useFavorites } from '@/contexts/FavoritesContext';
-import Navbar from '@/components/Navbar';
 import NameCard from '@/components/NameCard';
-import Footer from '@/components/Footer';
 import { Download, FileJson, Printer, Trash2, ArrowLeft, Heart } from 'lucide-react';
 import Link from 'next/link';
 
@@ -58,10 +56,8 @@ export default function FavoritesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
-      <Navbar />
-      
-      <main className="container mx-auto px-4 py-8 flex-grow">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="container mx-auto px-4 py-8">
         {/* Header with Back Button */}
         <div className="mb-8">
           <Link
@@ -146,9 +142,17 @@ export default function FavoritesPage() {
             </Link>
           </div>
         )}
-      </main>
+      </div>
 
-      <Footer />
+      {/* Footer */}
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center text-gray-600 dark:text-gray-400">
+            <p className="mb-2">© 2025 BabyNames. Powered by AI.</p>
+            <p className="text-sm">Made with ❤️ for parents-to-be</p>
+          </div>
+        </div>
+      </footer>
 
       {/* Print Styles */}
       <style jsx global>{`
