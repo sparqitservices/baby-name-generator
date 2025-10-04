@@ -1,124 +1,57 @@
 'use client';
-import { useState } from 'react';
+import { Moon, Sun, Heart, Search } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
+import { useFavorites } from '../contexts/FavoritesContext';
 import Link from 'next/link';
-import { useTheme } from '@/contexts/ThemeContext';
-import { Sun, Moon, Heart, Search, Menu, X } from 'lucide-react';
+import Logo from './Logo';
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { favorites } = useFavorites();
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="flex items-center justify-between h-16 sm:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-              <span className="text-white font-bold text-lg sm:text-xl">BNG</span>
-            </div>
-            <div className="hidden sm:block">
-              <h1 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">
-                BabyNames
-              </h1>
-              <p className="text-xs text-gray-600 dark:text-gray-400 -mt-1">
-                AI-POWERED GENERATOR
-              </p>
-            </div>
+    <nav className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 sm:h-20">
+          <Link href="/" className="transform hover:scale-105 transition-transform duration-200">
+            <Logo size="small" />
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Link
               href="/search"
-              className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors duration-200"
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
             >
-              Search Names
+              <Search className="w-5 h-5" />
+              <span className="font-medium hidden sm:inline">Search</span>
             </Link>
+
             <Link
               href="/favorites"
-              className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors duration-200"
+              className="relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
             >
-              Favorites
-            </Link>
-          </div>
-
-          {/* Action Buttons - Desktop & Mobile */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Search Icon */}
-            <Link
-              href="/search"
-              className="p-2 sm:p-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 transform hover:scale-105"
-              aria-label="Search"
-            >
-              <Search className="w-5 h-5 sm:w-5 sm:h-5" />
+              <Heart className="w-5 h-5" />
+              <span className="font-medium hidden sm:inline">Favorites</span>
+              {favorites.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 animate-pulse shadow-lg">
+                  {favorites.length}
+                </span>
+              )}
             </Link>
 
-            {/* Favorites Icon */}
-            <Link
-              href="/favorites"
-              className="p-2 sm:p-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 transform hover:scale-105"
-              aria-label="Favorites"
-            >
-              <Heart className="w-5 h-5 sm:w-5 sm:h-5" />
-            </Link>
-
-            {/* Theme Toggle - Enhanced for Mobile */}
             <button
               onClick={toggleTheme}
-              className="p-2 sm:p-2.5 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg"
+              className="p-2.5 sm:p-3 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-110 shadow-md hover:shadow-lg"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
-                <Sun className="w-5 h-5 sm:w-5 sm:h-5" strokeWidth={2.5} />
+                <Sun className="w-5 h-5 text-white" strokeWidth={2.5} />
               ) : (
-                <Moon className="w-5 h-5 sm:w-5 sm:h-5" strokeWidth={2.5} />
-              )}
-            </button>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
+                <Moon className="w-5 h-5 text-white" strokeWidth={2.5} />
               )}
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-800 animate-fade-in">
-            <div className="flex flex-col gap-2">
-              <Link
-                href="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg font-medium transition-colors duration-200"
-              >
-                Home
-              </Link>
-              <Link
-                href="/search"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg font-medium transition-colors duration-200"
-              >
-                Search Names
-              </Link>
-              <Link
-                href="/favorites"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg font-medium transition-colors duration-200"
-              >
-                Favorites
-              </Link>
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   );
