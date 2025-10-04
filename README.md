@@ -26,14 +26,14 @@
 - **Framework:** Next.js 14 (App Router)
 - **Styling:** Tailwind CSS
 - **Icons:** Lucide React
-- **AI:** Abacus.AI API
+- **AI:** Groq.AI API
 - **Deployment:** Vercel
 
 ## 📦 Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/afzalhameed/baby-name-generator.git
+git clone https://github.com/sparqitservices/baby-name-generator.git
 
 # Navigate to directory
 cd baby-name-generator

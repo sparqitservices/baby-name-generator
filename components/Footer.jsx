@@ -50,7 +50,7 @@ export default function Footer() {
                 <Linkedin className="w-5 h-5" />
               </a>
               <a 
-                href="https://twitter.com/afzalhameed" 
+                href="https://x.com/sparqitservices" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
@@ -73,17 +73,17 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/search" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                  Search Names
+                  Search Your Names
                 </Link>
               </li>
               <li>
                 <Link href="/favorites" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                  Favorites
+                  Your Favorites
                 </Link>
               </li>
               <li>
                 <a 
-                  href="https://www.sparqitservices.com" 
+                  href="https://sparqitservices.com/?utm_source=babynamegenerator&utm_medium=aitool&utm_campaign=afzal_sparqit&utm_content=bngbabynames" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-2"
