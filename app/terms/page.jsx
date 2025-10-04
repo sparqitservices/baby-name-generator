@@ -167,7 +167,7 @@ export default function TermsAndConditions() {
               </p>
               <div className="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
                 <p className="font-semibold text-indigo-600 dark:text-indigo-400">
-                  Email: support@babynamegenerator.com
+                  Email: info@sparqitservices.com
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">
                   Sparq IT Services<br />
