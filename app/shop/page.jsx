@@ -17,7 +17,7 @@ const products = [
     reviews: '2,345',
     category: 'Baby Gear',
     image: 'https://placehold.co/400x400/e0e7ff/4f46e5?text=Baby+Monitor',
-    affiliateLink: 'https://amazon.com/your-affiliate-link-1',
+    affiliateLink: 'https://amzn.to/3IEhOAd',
     badge: 'Best Seller',
     isPrime: true,
   },

@@ -147,14 +147,10 @@ export default function Footer() {
               No copyrights, just good vibes & zero drama.
             </p>
             <p className="text-gray-600 dark:text-gray-400 text-center md:text-right">
-              Built with ❤️ by{' '}
+              Made with ❤️ for {' '}
               <a 
-                href="https://x.com/iafzalhameed" 
-                target="_blank" 
-                rel="noopener noreferrer"
                 className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold transition-colors"
-              >
-                Afzal Hameed
+              >parents-to-be
               </a>
               
             </p>
