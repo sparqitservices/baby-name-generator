@@ -101,6 +101,16 @@ export default function Footer() {
                   GitHub Repository <ExternalLink className="w-4 h-4" />
                 </a>
               </li>
+              <li>
+  <Link href="/shop" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+    Baby Shop
+  </Link>
+</li>
+<li>
+  <Link href="/domains" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+    Domain Search
+  </Link>
+</li>
             </ul>
           </div>
 
