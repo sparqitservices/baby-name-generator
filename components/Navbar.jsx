@@ -26,8 +26,8 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-sm transition-all duration-300 ${
-        isScrolled ? 'shadow-lg' : ''
+      className={`fixed top-0 left-0 right-0 z-50 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 transition-all duration-300 ${
+        isScrolled ? 'shadow-lg' : 'shadow-sm'
       }`}
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
@@ -36,6 +36,7 @@ export default function Navbar() {
             isScrolled ? 'h-12 sm:h-14 md:h-16' : 'h-14 sm:h-16 md:h-20'
           }`}
         >
+          {/* Logo */}
           <Link
             href="/"
             className={`transform hover:scale-105 transition-all duration-300 flex-shrink-0 ${
@@ -45,21 +46,24 @@ export default function Navbar() {
             <Logo size="small" />
           </Link>
 
-          <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
+          {/* Navigation Items */}
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+            {/* Search - Hidden on mobile */}
             <Link
               href="/search"
-              className={`flex items-center gap-1 sm:gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 ${
-                isScrolled ? 'px-1.5 sm:px-2 md:px-3 py-1.5' : 'px-2 sm:px-3 md:px-4 py-2'
+              className={`hidden sm:flex items-center gap-1 sm:gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 ${
+                isScrolled ? 'px-2 md:px-3 py-1.5' : 'px-3 md:px-4 py-2'
               }`}
             >
               <Search
                 className={`transition-all duration-300 ${
-                  isScrolled ? 'w-4 h-4' : 'w-4 h-4 sm:w-5 sm:h-5'
+                  isScrolled ? 'w-4 h-4 sm:w-4.5 sm:h-4.5' : 'w-5 h-5'
                 }`}
               />
               <span className="font-medium hidden lg:inline text-sm">Search</span>
             </Link>
 
+            {/* Shop */}
             <Link
               href="/shop"
               className={`flex items-center gap-1 sm:gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 ${
@@ -74,20 +78,22 @@ export default function Navbar() {
               <span className="font-medium hidden lg:inline text-sm">Shop</span>
             </Link>
 
+            {/* Domains - Hidden on mobile */}
             <Link
               href="/domains"
-              className={`flex items-center gap-1 sm:gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 ${
-                isScrolled ? 'px-1.5 sm:px-2 md:px-3 py-1.5' : 'px-2 sm:px-3 md:px-4 py-2'
+              className={`hidden sm:flex items-center gap-1 sm:gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 ${
+                isScrolled ? 'px-2 md:px-3 py-1.5' : 'px-3 md:px-4 py-2'
               }`}
             >
               <Globe
                 className={`transition-all duration-300 ${
-                  isScrolled ? 'w-4 h-4' : 'w-4 h-4 sm:w-5 sm:h-5'
+                  isScrolled ? 'w-4 h-4 sm:w-4.5 sm:h-4.5' : 'w-5 h-5'
                 }`}
               />
               <span className="font-medium hidden lg:inline text-sm">Domains</span>
             </Link>
 
+            {/* Favorites */}
             <Link
               href="/favorites"
               className={`relative flex items-center gap-1 sm:gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 ${
@@ -107,10 +113,11 @@ export default function Navbar() {
               )}
             </Link>
 
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className={`rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-110 shadow-md hover:shadow-lg flex-shrink-0 ${
-                isScrolled ? 'p-1.5 sm:p-2' : 'p-2 sm:p-2.5 md:p-3'
+                isScrolled ? 'p-1.5 sm:p-2 md:p-2.5' : 'p-2 sm:p-2.5 md:p-3'
               }`}
               aria-label="Toggle theme"
             >

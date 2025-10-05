@@ -40,7 +40,8 @@ export default function RootLayout({ children }) {
           <FavoritesProvider>
             <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
               <Navbar />
-              <main className="flex-grow w-full overflow-x-hidden">
+              {/* Add padding-top to compensate for fixed navbar */}
+              <main className="flex-grow w-full overflow-x-hidden pt-14 sm:pt-16 md:pt-20">
                 {children}
               </main>
               <Footer />
