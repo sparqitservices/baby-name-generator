@@ -86,7 +86,7 @@ export default function SearchPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-            AI Name Search
+            Search Your Name
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
             Discover detailed meanings, origins, and cultural significance
