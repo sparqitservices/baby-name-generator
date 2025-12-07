@@ -1,123 +1,118 @@
 'use client';
-import { Github, Linkedin, Twitter, Mail, ExternalLink } from 'lucide-react';
+
 import { useState } from 'react';
 import Link from 'next/link';
-import { useTheme } from '@/contexts/ThemeContext';
+import { Mail } from 'lucide-react';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
-  const { theme } = useTheme();
 
-  const handleSubscribe = async (e) => {
+  const handleSubscribe = (e) => {
     e.preventDefault();
-    // Add your Mailchimp integration here
-    // For now, just show success message
+    // TODO: plug in your email provider (Mailchimp, Brevo, etc.)
     setSubscribed(true);
     setEmail('');
     setTimeout(() => setSubscribed(false), 3000);
   };
 
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="relative z-10 bg-white dark:bg-gray-900 text-gray-800 dark:text-white border-t border-gray-200 dark:border-gray-800 py-16 px-4 transition-colors duration-200">
+    <footer className="relative z-10 bg-white dark:bg-gray-900 text-gray-800 dark:text-white border-top border-gray-200 dark:border-gray-800 py-14 px-4 transition-colors duration-200">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 mb-10 md:mb-12">
           {/* About Section */}
           <div>
             <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
               BNG Baby Names
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              AI-powered baby name generator helping parents find the perfect name for their little ones. Discover meanings, origins, and cultural significance.
+            <p className="text-gray-600 dark:text-gray-400 mb-3 text-sm sm:text-base">
+              AI-powered baby name generator to help parents discover beautiful
+              names, meanings and origins – plus tools to secure domains and
+              explore baby essentials.
             </p>
-            <div className="flex gap-4">
-              <a 
-                href="https://github.com/sparqitservices" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
-                aria-label="GitHub"
-              >
-                <Github className="w-5 h-5" />
-              </a>
-              <a 
-                href="https://www.linkedin.com/company/sparq-it-services/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a 
-                href="https://x.com/sparqitservices" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition-all duration-200 transform hover:scale-110"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-              
-            </div>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-500 leading-relaxed">
+              Pronunciation powered by <span className="font-medium">ElevenLabs</span>.
+              Domain search uses <span className="font-medium">Namecheap</span>, and shop
+              links may be Amazon affiliate links at no extra cost to you.
+            </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Quick Links</h3>
-            <ul className="space-y-2 text-gray-600 dark:text-gray-400">
+            <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
+              Quick links
+            </h3>
+            <ul className="space-y-2 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
               <li>
-                <Link href="/" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/search" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                  Search Your Names
-                </Link>
-              </li>
-              <li>
-                <Link href="/favorites" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                  Your Favorites
-                </Link>
-              </li>
-              <li>
-                <a 
-                  href="https://sparqitservices.com/?utm_source=babynamegenerator&utm_medium=aitool&utm_campaign=afzal_sparqit&utm_content=bngbabynames" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-2"
+                <Link
+                  href="/"
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
-                  Company Website <ExternalLink className="w-4 h-4" />
-                </a>
+                  Home – AI name generator
+                </Link>
               </li>
               <li>
-                <a 
-                  href="https://github.com/sparqitservices/baby-name-generator" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-2"
+                <Link
+                  href="/search"
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
-                  GitHub Repository <ExternalLink className="w-4 h-4" />
-                </a>
+                  Search your names
+                </Link>
               </li>
               <li>
-  <Link href="/shop" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-    Baby Shop
-  </Link>
-</li>
-<li>
-  <Link href="/domains" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-    Domain Search
-  </Link>
-</li>
+                <Link
+                  href="/favorites"
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                >
+                  Your favourites
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/domains"
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                >
+                  Domain search
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/shop"
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                >
+                  Baby shop
+                </Link>
+              </li>
+              <li className="pt-2">
+                <Link
+                  href="/privacy"
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                >
+                  Privacy policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/terms"
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                >
+                  Terms &amp; conditions
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Newsletter */}
+          {/* Newsletter / Contact */}
           <div>
-            <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Stay Updated</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">Subscribe to get updates on new features!</p>
+            <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
+              Stay updated
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm sm:text-base">
+              Get occasional updates when we add new features, filters or naming
+              tools. No spam, just baby-name goodness.
+            </p>
             <form onSubmit={handleSubscribe} className="space-y-3">
               <input
                 type="email"
@@ -125,34 +120,42 @@ export default function Footer() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
-                className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm sm:text-base"
               />
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm sm:text-base"
               >
                 Subscribe
               </button>
               {subscribed && (
-                <p className="text-green-500 dark:text-green-400 text-sm animate-fade-in">✓ Successfully subscribed!</p>
+                <p className="text-green-500 dark:text-green-400 text-xs sm:text-sm animate-fade-in">
+                  ✓ Successfully subscribed! (demo message)
+                </p>
               )}
             </form>
+
+            <div className="mt-5 flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              <Mail className="w-4 h-4" />
+              <a
+                href="mailto:hello@babynamegenerator.xyz"
+                className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+              >
+                Contact: hello@babynamegenerator.xyz
+              </a>
+            </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-200 dark:border-gray-800 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-600 dark:text-gray-400 text-center md:text-left">
-              No copyrights, just good vibes & zero drama.
+        <div className="border-t border-gray-200 dark:border-gray-800 pt-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center md:text-left">
+              © {year} BNG Baby Names. Made with ❤️ for parents-to-be.
             </p>
-            <p className="text-gray-600 dark:text-gray-400 text-center md:text-right">
-              Made with ❤️ for {' '}
-              <a 
-                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold transition-colors"
-              >parents-to-be
-              </a>
-              
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-500 text-center md:text-right">
+              This tool is for inspiration only and does not replace personal,
+              cultural or religious guidance when choosing a baby name.
             </p>
           </div>
         </div>
