@@ -7,30 +7,53 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 export default function NameCard({ name }) {
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   const isFavorite = favorites.some((fav) => fav.name === name.name);
 
-  // 🔊 Simple pronunciation helper using browser SpeechSynthesis
-  const handleSpeak = () => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      console.warn('Speech synthesis not supported in this browser.');
-      return;
-    }
-
+  // 🔊 ElevenLabs + fallback to browser speech
+  const handleSpeak = async () => {
     const text = name.name;
-    if (!text) return;
+    if (!text || speaking) return;
 
-    // stop any current speech
-    window.speechSynthesis.cancel();
+    setSpeaking(true);
 
-    const utterance = new window.SpeechSynthesisUtterance(text);
+    try {
+      // Call our Next.js API route
+      const res = await fetch(`/api/pronounce?text=${encodeURIComponent(text)}`);
+      if (!res.ok) throw new Error('TTS failed');
 
-    // You can tweak this if you want different accents
-    // e.g. 'en-GB', 'en-US', 'hi-IN'
-    utterance.lang = 'en-US';
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
 
-    window.speechSynthesis.speak(utterance);
+      const audio = new Audio(url);
+      audio.onended = () => {
+        URL.revokeObjectURL(url);
+        setSpeaking(false);
+      };
+      audio.onerror = () => {
+        URL.revokeObjectURL(url);
+        setSpeaking(false);
+      };
+
+      audio.play().catch(() => {
+        setSpeaking(false);
+      });
+    } catch (err) {
+      console.error('ElevenLabs TTS error, falling back to SpeechSynthesis:', err);
+      setSpeaking(false);
+
+      // Fallback: browser speech synthesis if available
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        const synth = window.speechSynthesis;
+        synth.cancel();
+        const utterance = new window.SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        synth.speak(utterance);
+      }
+    }
   };
 
   const handleCopy = () => {
@@ -122,10 +145,19 @@ export default function NameCard({ name }) {
           {/* 🔊 Pronounce button */}
           <button
             onClick={handleSpeak}
-            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-all"
+            disabled={speaking}
+            className={`p-2 rounded-lg transition-all ${
+              speaking
+                ? 'bg-indigo-100 dark:bg-indigo-900/40 cursor-wait'
+                : 'bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/30'
+            }`}
             title="Listen to pronunciation"
           >
-            <Volume2 className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            <Volume2
+              className={`w-5 h-5 ${
+                speaking ? 'text-indigo-600' : 'text-gray-700 dark:text-gray-300'
+              }`}
+            />
           </button>
 
           <button
