@@ -8,13 +8,37 @@ export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    // TODO: plug in your email provider (Mailchimp, Brevo, etc.)
+const handleSubscribe = async (e) => {
+  e.preventDefault();
+  setSubscribed(false);
+
+  try {
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!res.ok) {
+      // Optional: show an error message
+      console.error('Subscription failed');
+      return;
+    }
+
+    const data = await res.json();
+    if (!data.ok) {
+      console.error('Subscription failed', data);
+      return;
+    }
+
     setSubscribed(true);
     setEmail('');
     setTimeout(() => setSubscribed(false), 3000);
-  };
+  } catch (err) {
+    console.error('Subscription error:', err);
+  }
+};
+
 
   const year = new Date().getFullYear();
 
@@ -138,10 +162,10 @@ export default function Footer() {
             <div className="mt-5 flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               <Mail className="w-4 h-4" />
               <a
-                href="mailto:hello@babynamegenerator.xyz"
+                href="mailto:info@sparqitservices.com"
                 className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
               >
-                Contact: hello@babynamegenerator.xyz
+                Contact: info@sparqitservices.com
               </a>
             </div>
           </div>
