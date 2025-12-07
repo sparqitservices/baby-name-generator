@@ -3,44 +3,51 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-const handleSubscribe = async (e) => {
-  e.preventDefault();
-  setSubscribed(false);
-
-  try {
-    const res = await fetch('/api/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-
-    if (!res.ok) {
-      // Optional: show an error message
-      console.error('Subscription failed');
-      return;
-    }
-
-    const data = await res.json();
-    if (!data.ok) {
-      console.error('Subscription failed', data);
-      return;
-    }
-
-    setSubscribed(true);
-    setEmail('');
-    setTimeout(() => setSubscribed(false), 3000);
-  } catch (err) {
-    console.error('Subscription error:', err);
-  }
-};
-
-
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const year = new Date().getFullYear();
+
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    setMessage('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || 'Subscription failed');
+      }
+
+      setEmail('');
+
+      if (data.existing) {
+        // ✅ Already subscribed: show message, no redirect
+        setMessage("You're already subscribed. We'll keep you posted ❤️");
+      } else {
+        // ✅ New subscriber: redirect to thank you page
+        router.push('/thank-you');
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage('Something went wrong. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <footer className="relative z-10 bg-white dark:bg-gray-900 text-gray-800 dark:text-white border-top border-gray-200 dark:border-gray-800 py-14 px-4 transition-colors duration-200">
@@ -137,27 +144,30 @@ const handleSubscribe = async (e) => {
               Get occasional updates when we add new features, filters or naming
               tools. No spam, just baby-name goodness.
             </p>
-            <form onSubmit={handleSubscribe} className="space-y-3">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                required
-                className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm sm:text-base"
-              />
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm sm:text-base"
-              >
-                Subscribe
-              </button>
-              {subscribed && (
-                <p className="text-green-500 dark:text-green-400 text-xs sm:text-sm animate-fade-in">
-                  ✓ Successfully subscribed! (demo message)
-                </p>
-              )}
-            </form>
+           <form onSubmit={handleSubscribe} className="space-y-3">
+    <input
+    type="email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    placeholder="Enter your email"
+    required
+    className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm sm:text-base"
+  />
+  <button
+    type="submit"
+    disabled={loading}
+    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm sm:text-base disabled:opacity-60 disabled:cursor-not-allowed"
+  >
+    {loading ? 'Subscribing…' : 'Subscribe'}
+  </button>
+
+  {message && (
+    <p className="text-xs sm:text-sm mt-1 text-center text-gray-700 dark:text-gray-300">
+      {message}
+    </p>
+  )}
+    </form>
+
 
             <div className="mt-5 flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               <Mail className="w-4 h-4" />
