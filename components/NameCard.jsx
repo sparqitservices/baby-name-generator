@@ -4,45 +4,47 @@ import { useState } from 'react';
 import { Copy, Check, Heart, Share2, Volume2 } from 'lucide-react';
 import { useFavorites } from '@/contexts/FavoritesContext';
 
+// Simple in-memory cache for generated audio URLs
+// key: name string, value: object URL (string)
+const audioCache = new Map();
+
 export default function NameCard({ name }) {
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   const isFavorite = favorites.some((fav) => fav.name === name.name);
 
-  // 🔊 ElevenLabs + fallback to browser speech
+  // 🔊 ElevenLabs TTS + cache + fallback
   const handleSpeak = async () => {
     const text = name.name;
-    if (!text || speaking) return;
+    if (!text || isLoadingAudio) return;
 
-    setSpeaking(true);
+    // If we already have audio cached for this name, just play it
+    if (audioCache.has(text)) {
+      const cachedUrl = audioCache.get(text);
+      playAudioFromUrl(cachedUrl);
+      return;
+    }
+
+    setIsLoadingAudio(true);
 
     try {
-      // Call our Next.js API route
       const res = await fetch(`/api/pronounce?text=${encodeURIComponent(text)}`);
       if (!res.ok) throw new Error('TTS failed');
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
 
-      const audio = new Audio(url);
-      audio.onended = () => {
-        URL.revokeObjectURL(url);
-        setSpeaking(false);
-      };
-      audio.onerror = () => {
-        URL.revokeObjectURL(url);
-        setSpeaking(false);
-      };
+      // Cache it for future plays
+      audioCache.set(text, url);
 
-      audio.play().catch(() => {
-        setSpeaking(false);
-      });
+      playAudioFromUrl(url);
     } catch (err) {
       console.error('ElevenLabs TTS error, falling back to SpeechSynthesis:', err);
-      setSpeaking(false);
+      setIsLoadingAudio(false);
 
       // Fallback: browser speech synthesis if available
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -51,9 +53,28 @@ export default function NameCard({ name }) {
         const utterance = new window.SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
         utterance.rate = 0.9;
+        setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
         synth.speak(utterance);
       }
     }
+  };
+
+  const playAudioFromUrl = (url) => {
+    const audio = new Audio(url);
+    setIsLoadingAudio(false);
+    setIsSpeaking(true);
+
+    audio.onended = () => {
+      setIsSpeaking(false);
+    };
+    audio.onerror = () => {
+      setIsSpeaking(false);
+    };
+
+    audio.play().catch(() => {
+      setIsSpeaking(false);
+    });
   };
 
   const handleCopy = () => {
@@ -112,6 +133,12 @@ export default function NameCard({ name }) {
     any: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300',
   };
 
+  const speakTitle = isLoadingAudio
+    ? 'Preparing pronunciation...'
+    : isSpeaking
+    ? 'Playing pronunciation'
+    : 'Listen to pronunciation';
+
   return (
     <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border-2 border-transparent hover:border-indigo-200 dark:hover:border-indigo-800">
       <div className="flex items-start justify-between mb-4">
@@ -142,22 +169,29 @@ export default function NameCard({ name }) {
 
         {/* Action buttons */}
         <div className="flex gap-2">
-          {/* 🔊 Pronounce button */}
+          {/* 🔊 Pronounce button with loading / speaking animation */}
           <button
             onClick={handleSpeak}
-            disabled={speaking}
+            disabled={isLoadingAudio}
             className={`p-2 rounded-lg transition-all ${
-              speaking
-                ? 'bg-indigo-100 dark:bg-indigo-900/40 cursor-wait'
+              isSpeaking
+                ? 'bg-indigo-100 dark:bg-indigo-900/40'
+                : isLoadingAudio
+                ? 'bg-gray-100 dark:bg-gray-700 cursor-wait'
                 : 'bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/30'
             }`}
-            title="Listen to pronunciation"
+            title={speakTitle}
           >
-            <Volume2
-              className={`w-5 h-5 ${
-                speaking ? 'text-indigo-600' : 'text-gray-700 dark:text-gray-300'
-              }`}
-            />
+            {isLoadingAudio ? (
+              // Spinner
+              <span className="block w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Volume2
+                className={`w-5 h-5 ${
+                  isSpeaking ? 'text-indigo-600' : 'text-gray-700 dark:text-gray-300'
+                }`}
+              />
+            )}
           </button>
 
           <button
