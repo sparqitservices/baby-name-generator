@@ -45,6 +45,74 @@ export const metadata = {
   },
 };
 
+export const metadata = {
+  metadataBase: new URL('https://babynamegenerator.xyz'),
+  title: {
+    default: 'BNG Baby Names – AI Baby Name Generator',
+    template: '%s | BNG Baby Names',
+  },
+  description:
+    'BNG Baby Names is an AI-powered baby name generator that helps parents discover beautiful baby boy, girl and unisex names with meanings, origins and pronunciation. Also check domains and baby essentials.',
+  applicationName: 'BNG Baby Names',
+  keywords: [
+    'baby names',
+    'baby name generator',
+    'BNG baby names',
+    'muslim baby names',
+    'indian baby names',
+    'hindu baby names',
+    'urdu baby names',
+    'modern baby names',
+    'unique baby names',
+    'unisex baby names',
+    'baby name meanings',
+    'baby domain name',
+  ],
+  authors: [{ name: 'BNG Baby Names' }],
+  creator: 'BNG Baby Names',
+  publisher: 'BNG Baby Names',
+  openGraph: {
+    title: 'BNG Baby Names – AI Baby Name Generator',
+    description:
+      'Generate meaningful baby names with meanings and origins, save favourites, listen to pronunciation and check domains for your favourite names.',
+    url: 'https://babynamegenerator.xyz/',
+    siteName: 'BNG Baby Names',
+    images: [
+      {
+        url: '/og-image.png', // place a 1200x630 image in /public/og-image.png
+        width: 1200,
+        height: 630,
+        alt: 'BNG Baby Names – AI Baby Name Generator',
+      },
+    ],
+    locale: 'en_IN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'BNG Baby Names – AI Baby Name Generator',
+    description:
+      'Discover baby name ideas with our AI-powered generator. Filter by gender, culture and style, save favourites and secure matching domains.',
+    // change to your real handle if/when you have one
+    site: '@babynamegenerator',
+    creator: '@babynamegenerator',
+    images: ['/og-image.png'],
+  },
+  alternates: {
+    canonical: '/',
+    languages: {
+      'en': '/',
+      'en-IN': '/',
+    },
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png', // add this file if you want iOS homescreen icon
+  },
+};
+
+
 export default function RootLayout({ children }) {
   const jsonLd = {
     '@context': 'https://schema.org',
