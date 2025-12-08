@@ -172,10 +172,10 @@ export default function Footer() {
             <div className="mt-5 flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               <Mail className="w-4 h-4" />
               <a
-                href="mailto:info@sparqitservices.com"
+                href="mailto:hello@babynamegenerator.xyz"
                 className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
               >
-                Contact: info@sparqitservices.com
+                Contact: hello@babynamegenerator.xyz
               </a>
             </div>
           </div>
