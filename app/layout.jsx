@@ -8,43 +8,7 @@ import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
-export const metadata = {
-  metadataBase: new URL('https://babynamegenerator.xyz'),
-  title: {
-    default: 'BNG – AI Baby Name Generator',
-    template: '%s | BNG Baby Names',
-  },
-  description:
-    'AI baby name generator for Indian and international parents. Discover modern, traditional, Muslim, Hindu, Christian and unisex baby names with meanings.',
-  keywords: [
-    'baby name generator',
-    'Indian baby names',
-    'Muslim baby names',
-    'Hindu baby names',
-    'Christian baby names',
-    'unisex baby names',
-    'modern baby names',
-    'unique baby names',
-  ],
-  openGraph: {
-    title: 'BNG – AI Baby Name Generator',
-    description:
-      'Find the perfect baby name with AI-powered suggestions. Filter by gender, religion, style and more.',
-    url: 'https://babynamegenerator.xyz',
-    siteName: 'BNG Baby Names',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'BNG – AI Baby Name Generator',
-    description:
-      'Discover beautiful baby boy, girl and unisex names with meanings using AI.',
-  },
-  alternates: {
-    canonical: '/',
-  },
-};
-
+// ✅ SINGLE metadata export (old + new merged)
 export const metadata = {
   metadataBase: new URL('https://babynamegenerator.xyz'),
   title: {
@@ -55,16 +19,17 @@ export const metadata = {
     'BNG Baby Names is an AI-powered baby name generator that helps parents discover beautiful baby boy, girl and unisex names with meanings, origins and pronunciation. Also check domains and baby essentials.',
   applicationName: 'BNG Baby Names',
   keywords: [
-    'baby names',
     'baby name generator',
+    'baby names',
     'BNG baby names',
-    'muslim baby names',
-    'indian baby names',
-    'hindu baby names',
+    'Indian baby names',
+    'Muslim baby names',
+    'Hindu baby names',
+    'Christian baby names',
     'urdu baby names',
+    'unisex baby names',
     'modern baby names',
     'unique baby names',
-    'unisex baby names',
     'baby name meanings',
     'baby domain name',
   ],
@@ -79,7 +44,7 @@ export const metadata = {
     siteName: 'BNG Baby Names',
     images: [
       {
-        url: '/og-image.png', // place a 1200x630 image in /public/og-image.png
+        url: '/og-image.png', // put 1200x630 image in /public/og-image.png
         width: 1200,
         height: 630,
         alt: 'BNG Baby Names – AI Baby Name Generator',
@@ -101,17 +66,16 @@ export const metadata = {
   alternates: {
     canonical: '/',
     languages: {
-      'en': '/',
+      en: '/',
       'en-IN': '/',
     },
   },
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.png', // add this file if you want iOS homescreen icon
+    apple: '/apple-touch-icon.png', // optional but recommended
   },
 };
-
 
 export default function RootLayout({ children }) {
   const jsonLd = {
@@ -140,7 +104,7 @@ export default function RootLayout({ children }) {
           `}
         </Script>
 
-        {/* Canonical */}
+        {/* Canonical (metadata.alternates also defines canonical, but this is fine) */}
         <link rel="canonical" href="https://babynamegenerator.xyz" />
 
         {/* Structured data */}
